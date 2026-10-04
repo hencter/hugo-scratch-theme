@@ -22,7 +22,16 @@
       <div class="layout{{ if $flags.sidebar }} layout--with-sidebar{{ end }}{{ if $flags.toc }} layout--with-toc{{ end }}{{ if not (or $flags.sidebar $flags.toc) }} layout--solo{{ end }}">
         {{ partial "sidebar.html" . }}
 
-        <main id="main" class="page {{ if .IsPage }}page--reading{{ else }}page--wide{{ end }}" tabindex="-1">
+        {{- /* How wide a page may get follows what is ON it, not which kind it is.
+               The home page is a hero plus a card grid, so it is the one page
+               that is deliberately wide. Every other kind is read: an index is a
+               list of rows and prose, and letting those fill the middle track
+               gave the changelog ~115-character lines in a 63rem column, with the
+               table of contents marooned at the far right. */ -}}
+        {{- $pageClass := "page--list" -}}
+        {{- if .IsPage }}{{ $pageClass = "page--reading" }}{{ end -}}
+        {{- if .IsHome }}{{ $pageClass = "page--wide" }}{{ end -}}
+        <main id="main" class="page {{ $pageClass }}" tabindex="-1">
           {{ block "main" . }}{{ end }}
         </main>
 

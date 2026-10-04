@@ -89,9 +89,24 @@
   }
 }
 
+/* The `page--*` classes name WHY a page deviates from the measure; only
+   `page--wide` actually changes it. `page--reading` (a leaf page) and
+   `page--list` (home, sections, taxonomies, terms) both read at
+   `--content-measure`, so they need no rule of their own — they are hooks for a
+   site that wants to treat one of those groups differently. */
 .page {
   min-width: 0;
   max-width: var(--content-measure);
+  /* The reading column is centred in whatever track the grid hands it.
+     `.layout--solo` already achieved this through `justify-items: center`, but
+     the multi-column layouts did not: as soon as the middle track is wider than
+     `--content-measure` — every blog post, where the TOC column takes the
+     right-hand third — the entire leftover was dumped on one side of the text
+     instead of being split evenly. `margin-inline: auto` on a grid item absorbs
+     exactly that leftover, and it is a no-op when the track is already narrower
+     than the measure, which is the case for a docs page carrying both a sidebar
+     and a TOC (44rem of track for a 46rem measure). */
+  margin-inline: auto;
 }
 
 .layout--wide .page,
