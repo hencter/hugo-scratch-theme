@@ -119,6 +119,19 @@ h6:hover > .heading-anchor,
   overflow: hidden;
 }
 
+/* `transform.HighlightCodeBlock .Wrapped` emits its own element carrying the
+   wrapper class from `[markup.highlight] wrapperClass` — `highlight` by default,
+   which is the same class the container above uses to hold the language label
+   and the copy button. Flatten that inner element so the nested pair reads as
+   ONE box: the outer keeps the border, radius, margin and background. */
+.highlight .highlight {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  overflow: visible;
+}
+
 .highlight__header {
   display: flex;
   gap: var(--space-3);

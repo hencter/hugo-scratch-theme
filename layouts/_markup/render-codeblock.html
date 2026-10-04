@@ -1,14 +1,31 @@
 {{- /*
   render-codeblock.html — every fenced code block goes through here.
 
-  `transform.HighlightCodeBlock .` does the Chroma work and returns both the
-  highlighted inner HTML and a ready-wrapped variant. Building the wrapper here
-  instead buys three things the default cannot:
+  `transform.HighlightCodeBlock .` does the Chroma work and returns TWO strings
+  that are not interchangeable (measured on Hugo 0.167.0, not recalled):
+
+    · .Inner   — the highlighted code and NOTHING ELSE. No `<pre>`, no `<code>`,
+                 and therefore no `.chroma` element, so the line breaks collapse
+                 into spaces and not one selector in chroma-*.css matches. It
+                 also drops the line-number table when a fence asks for
+                 `linenos`. Rendering .Inner is what made every code block on
+                 this site monochrome and run together on one line.
+    · .Wrapped — the complete block, identical to what {{ highlight }} emits:
+                 <div class="highlight"><pre class="chroma"><code …>.
+
+  So the wrapper has to come from .Wrapped. The surrounding `<div>` and header
+  below buy three things the default cannot:
 
     · the language label, so a reader knows what they are looking at;
     · `{filename="…"}` from the fence info string, shown in the header;
     · a copy button — rendered server-side, so it is present even when the
       bundle fails to load (assets/js/modules/copy.js only makes it work).
+
+  `.Wrapped` carries its own element with the wrapper class from
+  `[markup.highlight] wrapperClass` — the default, `highlight`, which is also
+  the class this template puts on the container above. content.css flattens that
+  inner element, so the block still shows one border and one margin rather than
+  two nested boxes.
 
   `noClasses = false` in the config is what makes Chroma emit class names
   instead of inline styles; without it this hook would still work, but the
@@ -26,5 +43,5 @@
     {{- with $filename }}<span class="highlight__filename">{{ . }}</span>{{ end }}
     <button class="copy-button" type="button" data-copy-code>{{ T "copy" }}</button>
   </div>
-  {{ $result.Inner }}
+  {{ $result.Wrapped }}
 </div>
