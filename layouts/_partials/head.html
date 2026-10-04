@@ -4,7 +4,8 @@
   The order is deliberate:
 
     1. charset and viewport first, always
-    2. the metadata crawlers and social scrapers read
+    2. the metadata crawlers and social scrapers read, plus the icon
+       declarations the browser uses before the first paint
     3. the theme bootstrap script — inline and synchronous, so the correct
        colour scheme is already on <html> before the first paint (no flash)
     4. stylesheet, then deferred JavaScript
@@ -20,6 +21,7 @@
   <meta name="color-scheme" content="light dark">
 
   {{ partial "head/meta.html" . }}
+  {{ partial "head/icons.html" . }}
   {{ partial "head/alternates.html" . }}
   {{ partial "head/opengraph.html" . }}
   {{ partial "head/verification.html" . }}

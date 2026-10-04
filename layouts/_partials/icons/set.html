@@ -1,0 +1,22 @@
+{{- /*
+  icons/set.html — load one IconifyJSON collection.
+
+  Called through `partialCached` from icon.html, so a collection is parsed once
+  per build instead of once per icon: this site renders icons on every page, and
+  an uncached `transform.Unmarshal` per call would re-read the file thousands of
+  times. The cache key is the set prefix, which is also the file name.
+
+  `return` hands the collection back to the caller; a prefix with no file
+  returns an empty map, which is falsy, so the caller can treat "no such set"
+  and "no such icon" separately.
+
+  @context {string} set prefix, e.g. "lucide"
+  @returns {map} parsed IconifyJSON collection, or an empty map
+*/ -}}
+
+{{- $prefix := . -}}
+{{- $data := dict -}}
+{{- with resources.Get (printf "icons/%s.json" $prefix) -}}
+  {{- $data = . | transform.Unmarshal -}}
+{{- end -}}
+{{- return $data -}}

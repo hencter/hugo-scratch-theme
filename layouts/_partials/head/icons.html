@@ -1,0 +1,25 @@
+{{- /*
+  head/icons.html — the icon declarations a browser reads.
+
+  WHY THIS FILE EXISTS. The icons themselves live in static/, but a file in
+  static/ is only a *copy* in the output — something in the HTML has to point at
+  it. Nothing did: measured over the whole built site, 0 of 280 pages carried
+  `rel="icon"`, `rel="apple-touch-icon"` or `rel="manifest"`. The consequence was
+  that `favicon.svg` and `site.webmanifest` were dead weight in every build, and
+  the only icon a browser ever showed came from its own request for
+  `/favicon.ico`, a convention from the IE era.
+
+  The SVG comes first because it is the only format that stays sharp at every
+  size; the 32x32 PNG is the fallback for a browser that will not take an SVG
+  icon, and the 180x180 PNG is what iOS puts on a home screen. Once these are
+  declared, a legacy `/favicon.ico` is redundant — which is why this theme no
+  longer ships one.
+
+  URLs go through `relURL` rather than being written as "/favicon.svg", so they
+  follow `baseURL`: the same markup is correct on a custom domain served from the
+  root and on a project site published under `/<repo>/`.
+*/ -}}
+<link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | relURL }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ "favicon-32x32.png" | relURL }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ "apple-touch-icon.png" | relURL }}">
+<link rel="manifest" href="{{ "site.webmanifest" | relURL }}">

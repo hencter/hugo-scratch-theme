@@ -1,13 +1,26 @@
 {{- /*
-  icon.html — inline SVG icon.
+  icon.html — inline SVG icon, read from Iconify data.
 
-  Icons are inlined rather than loaded as a font, an external sprite or a JS icon
-  library: they inherit `currentColor` (so the dark theme needs no extra work),
-  they cannot flash, they add no request, and — unlike an external SVG sprite
-  referenced with <use href="…"> — no cross-document styling rules apply. Call
-  with the icon name:
+  WHY IT IS INLINE. Icons are inlined rather than loaded as a font, an external
+  sprite or a JS icon library: they inherit `currentColor` (so the dark theme
+  needs no extra work), they cannot flash, they add no request, and — unlike an
+  external SVG sprite referenced with <use href="…"> — no cross-document styling
+  rules apply.
 
-      {{ partial "icon.html" "search" }}
+  WHERE THE PATHS COME FROM. Hugo has no icon system: `hugo gen` offers only
+  chromastyles, doc and man. So the paths live in IconifyJSON collections —
+  the format the Iconify project publishes for 200 000+ icons — under
+  `assets/icons/`, and are read with `resources.Get` + `transform.Unmarshal`:
+
+      assets/icons/lucide.json   vendored subset, upstream spelling kept in
+                                 `icons`, template spelling in `aliases`
+      assets/icons/local.json    marks that belong to no set (the brand mark)
+
+  The data is COMMITTED and the lookup is pure Hugo, so the build needs no npm
+  package, no script and no network. Adding an icon is an edit to one JSON file;
+  the warning below hands you the exact URL to copy the body from. Dropping one
+  of Iconify's own `icons.json` archives in under the same name also works —
+  same shape, same lookup — which is how you would get a whole set at once.
 
   TWO THINGS ARE LOAD-BEARING, and both exist because of a real bug:
 
@@ -21,48 +34,64 @@
      They are the fallback for the case the stylesheet never arrives: without
      them a broken CSS response turns every icon into a page-breaking block.
 
+  This partial deliberately adds NO fill or stroke of its own: Iconify bakes
+  `fill="currentColor"` / `stroke="currentColor"` into each body, which is what
+  lets one partial render both stroke-based sets (lucide) and fill-based ones
+  (simple-icons). The background is transparent by default, so an icon never
+  paints a box behind itself.
+
+  Call with a name in the default set, or `prefix:name`:
+
+      {{ partial "icon.html" "search" }}
+      {{ partial "icon.html" "local:logo" }}
+
   Decorative icons are marked aria-hidden; an icon that carries meaning must sit
   next to real text (or a visually-hidden label) in the caller.
 
-  A name that is not in the map is a typo, and a typo would otherwise render as
-  nothing at all — invisible in review. It warns instead, so `--panicOnWarning`
-  turns it into a failed build.
+  A name that resolves to nothing warns instead of rendering an empty <svg>, so
+  `--panicOnWarning` turns a typo into a failed build.
 */ -}}
 
-{{- $name := . -}}
-{{- $attrs := `class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"` -}}
-
-{{- $icons := dict
-  "sun"          (printf `<svg %s><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>` $attrs)
-  "moon"         (printf `<svg %s><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>` $attrs)
-  "search"       (printf `<svg %s><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>` $attrs)
-  "menu"         (printf `<svg %s><path d="M3 6h18M3 12h18M3 18h18"/></svg>` $attrs)
-  "close"        (printf `<svg %s><path d="M18 6 6 18M6 6l12 12"/></svg>` $attrs)
-  "arrow-up"     (printf `<svg %s><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>` $attrs)
-  "arrow-left"   (printf `<svg %s><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>` $attrs)
-  "arrow-right"  (printf `<svg %s><path d="M5 12h14m0 0-6-6m6 6-6 6"/></svg>` $attrs)
-  "chevron-right" (printf `<svg %s><path d="m9 6 6 6-6 6"/></svg>` $attrs)
-  "external"     (printf `<svg %s><path d="M14 4h6v6M20 4l-8 8"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>` $attrs)
-  "copy"         (printf `<svg %s><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>` $attrs)
-  "check"        (printf `<svg %s><path d="m5 13 4 4L19 7"/></svg>` $attrs)
-  "rss"          (printf `<svg %s><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.5"/></svg>` $attrs)
-  "github"       (printf `<svg %s><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 4.5-1.4 4.5-5a4 4 0 0 0-1.1-2.8 3.7 3.7 0 0 0-.1-2.8s-1.1-.3-3.5 1.3a8.6 8.6 0 0 0-4.6 0C7.3 4.8 6.2 5.1 6.2 5.1a3.7 3.7 0 0 0-.1 2.8A4 4 0 0 0 5 10.7c0 3.6 1.7 4.7 4.5 5-.4.4-.5.9-.5 1.6V21"/></svg>` $attrs)
-  "calendar"     (printf `<svg %s><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 11h18"/></svg>` $attrs)
-  "clock"        (printf `<svg %s><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>` $attrs)
-  "globe"        (printf `<svg %s><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/></svg>` $attrs)
-  "tag"          (printf `<svg %s><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>` $attrs)
-  "list"         (printf `<svg %s><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>` $attrs)
-  "info"         (printf `<svg %s><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>` $attrs)
-  "lightbulb"    (printf `<svg %s><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.3.3.5.7.5 1.1v1h6v-1c0-.4.2-.8.5-1.1A6 6 0 0 0 12 3Z"/></svg>` $attrs)
-  "alert"        (printf `<svg %s><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>` $attrs)
-  "shield"       (printf `<svg %s><path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>` $attrs)
-  "book"         (printf `<svg %s><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></svg>` $attrs)
-  "layers"       (printf `<svg %s><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>` $attrs)
-  "logo"         (printf `<svg %s><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="17" r="2.5"/></svg>` $attrs)
--}}
-
-{{- $svg := index $icons $name -}}
-{{- if not $svg -}}
-  {{- warnf "icon.html: unknown icon %q — check the name against the map in this file" $name -}}
+{{- $requested := . -}}
+{{- $prefix := "lucide" -}}
+{{- $name := $requested -}}
+{{- if strings.Contains $requested ":" -}}
+  {{- $parts := split $requested ":" -}}
+  {{- $prefix = index $parts 0 -}}
+  {{- $name = index $parts 1 -}}
 {{- end -}}
-{{- $svg | default "" | safeHTML -}}
+
+{{- $set := partialCached "icons/set.html" $prefix $prefix -}}
+{{- $icon := false -}}
+
+{{- with $set -}}
+  {{- with index .icons $name -}}
+    {{- $icon = . -}}
+  {{- else -}}
+    {{- with index .aliases $name -}}
+      {{- if or .rotate .hFlip .vFlip -}}
+        {{- warnf "icon.html: %q is an alias that carries a transform; this partial renders plain bodies only — vendor the resolved icon instead of relying on the alias" $requested -}}
+      {{- else -}}
+        {{- $icon = index $set.icons .parent -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if not $icon -}}
+  {{- if not $set -}}
+    {{- warnf "icon.html: no icon set for prefix %q — expected assets/icons/%s.json in IconifyJSON format" $prefix $prefix -}}
+  {{- else -}}
+    {{- warnf "icon.html: %q is not in assets/icons/%s.json. Copy it from %s — the collection keeps upstream names under `icons` and template names under `aliases`" $requested $prefix (printf "https://api.iconify.design/%s.json?icons=%s" $prefix $name) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $width := or $icon.width $set.width 24 -}}
+  {{- $height := or $icon.height $set.height 24 -}}
+  {{- $left := or $icon.left 0 -}}
+  {{- $top := or $icon.top 0 -}}
+  {{- /* Iconify's own rule: an icon may override the set's box, and an alias or
+       a hand-drawn mark may sit off the origin (left/top). The viewBox has to
+       follow, or the paths are clipped. */ -}}
+  {{- $viewBox := printf "%v %v %v %v" $left $top $width $height -}}
+  <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="{{ $viewBox }}" width="20" height="20" aria-hidden="true" focusable="false">{{ $icon.body | safeHTML }}</svg>
+{{- end -}}
