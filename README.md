@@ -1,11 +1,11 @@
 # Hugo Scratch Theme
 
 A batteries-included example Hugo theme: semantic HTML, a complete SEO head, bilingual
-navigation, client-side search, flash-free light/dark themes, a shortcode library, seven render
-hooks, and a CSS/JS pipeline built from Hugo Pipes plus Hugo's **official Tailwind CSS v4
-integration**.
+navigation, client-side search, flash-free light/dark themes, a shortcode library,
+Iconify-backed icons, seven render hooks, and a CSS/JS pipeline built from Hugo Pipes plus
+Hugo's **official Tailwind CSS v4 integration**.
 
-It is the theme behind <https://hencter.github.io/hugo-scratch/>, and it is deliberately a
+It is the theme behind <https://scratch.hugozh.cn/>, and it is deliberately a
 *teaching* theme: every non-obvious decision is explained in a comment next to the code, and
 [`AGENTS.md`](https://github.com/hencter/hugo-scratch/blob/main/AGENTS.md) in the demo site
 records the traps that cost real debugging cycles.
@@ -183,11 +183,12 @@ layouts/
 ├── home.llms.txt  home.search.json  home.pages.json
 ├── rss.xml  sitemap.xml  robots.txt
 ├── _partials/
-│   ├── head.html  head/{meta,alternates,opengraph,schema,css,js,verification,theme-init}.html
+│   ├── head.html  head/{meta,icons,alternates,opengraph,schema,css,js,verification,theme-init}.html
 │   ├── header.html  menu.html  sidebar.html  toc.html  breadcrumbs.html  footer.html
 │   ├── page-meta.html  page-nav.html  pagination.html  page-list.html  card.html
 │   ├── terms.html  facts.html  banner.html  search.html  theme-toggle.html
 │   ├── lang-switcher.html  analytics.html  comments.html  scripts.html  icon.html
+│   ├── icons/set.html          loads one IconifyJSON collection, cached per build
 │   ├── layout/flags.html       returns {sidebar, toc}
 │   ├── resolve-image.html      returns {url, width, height, resource}
 │   └── shortcodes/callout.html
@@ -196,6 +197,13 @@ layouts/
 │                               video youtube figure toc changelog
 └── _markup/                    render-heading image link codeblock blockquote table passthrough
 ```
+
+**Header controls** — the language switcher is one control whatever the number of languages: with
+exactly two there is nothing to choose *between*, so it is a direct link to the other language,
+and from three up it is a native `<details>` disclosure. The colour-theme button changes the
+appearance on the first click: it skips any state that would resolve to the theme already on
+screen, so a reader whose system is light reaches dark immediately instead of spending a click
+re-selecting light.
 
 **Params** (all optional; these are the theme's defaults, a site's values win):
 
@@ -244,6 +252,53 @@ support `type` and `layout` front matter, so a single section can use its own pa
 
 ---
 
+## Icons
+
+Icons are inline SVG driven by [Iconify](https://iconify.design) data — not a font, not a
+sprite, not a JS library, and not an npm package:
+
+```
+assets/icons/
+├── lucide.json      vendored IconifyJSON collection: the set the theme draws from
+└── local.json       marks that belong to no set — the brand mark
+```
+
+`layouts/_partials/icon.html` reads a collection with `resources.Get` + `transform.Unmarshal`;
+`layouts/_partials/icons/set.html`, called through `partialCached`, parses each collection once
+per build rather than once per icon.
+
+```go-html-template
+{{ partial "icon.html" "search" }}        {{/* default set: lucide */}}
+{{ partial "icon.html" "local:logo" }}    {{/* prefix:name */}}
+```
+
+Three properties are deliberate:
+
+* the partial adds **no** `fill` or `stroke` of its own. Iconify bakes `currentColor` into every
+  body, so one partial renders both stroke-based sets (lucide) and fill-based ones
+  (simple-icons), and the dark theme needs nothing extra;
+* the data is **committed**, so the build needs no npm install, no script and no network. To add
+  an icon, open the URL the build warning prints — for example
+  `https://api.iconify.design/lucide.json?icons=rocket` — and paste the entry under `icons` in
+  `assets/icons/lucide.json`. The collection keeps upstream names under `icons` and
+  template-facing names under `aliases`, so a call site can keep saying `close` while the body
+  comes from `x`;
+* a name that resolves to nothing **warns**, so `--panicOnWarning` turns a typo into a failed
+  build instead of an empty `<svg>`.
+
+`static/` holds what the browser reads before the page renders — `favicon.svg`,
+`favicon-32x32.png`, `apple-touch-icon.png`, `site.webmanifest` — and
+`layouts/_partials/head/icons.html` declares them.
+
+The theme ships **no `favicon.ico`**. One used to sit in `static/`, and it was byte-identical to
+the placeholder `hugo new theme` scaffolds. Because nothing in the HTML declared `favicon.svg`,
+that placeholder was the icon every browser actually displayed. With the declarations in place an
+`.ico` is redundant, and this theme cannot produce one anyway: Hugo cannot rasterise an SVG
+(`Resize` on an `image/svg+xml` resource fails), so any `.ico` would have to come from a tool
+outside the Hugo toolchain.
+
+---
+
 ## Regenerating committed assets
 
 Both are generated and committed, so this is optional:
@@ -259,6 +314,10 @@ python scripts/generate-assets.py
 
 `scripts/generate-assets.py` exists so the raster brand images are reproducible rather than
 mystery binaries. Nothing in the build pipeline needs Python.
+
+The icon data under `assets/icons/` is committed data, not generated by the build: it is copied
+from the Iconify API with any tool you like (or none — the URL returns JSON a browser can show).
+Nothing in the build pipeline needs network access either.
 
 ---
 

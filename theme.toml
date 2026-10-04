@@ -8,7 +8,7 @@ license = "MIT"
 licenselink = "https://github.com/hencter/hugo-scratch-theme/blob/main/LICENSE"
 description = "A batteries-included example Hugo theme: semantic HTML, complete SEO head, bilingual navigation, client-side search, dark mode, shortcodes, render hooks, and a CSS/JS pipeline built only with Hugo Pipes."
 homepage = "https://github.com/hencter/hugo-scratch-theme"
-demosite = "https://hencter.github.io/hugo-scratch/"
+demosite = "https://scratch.hugozh.cn/"
 tags = ["blog", "docs", "multilingual", "responsive", "seo", "dark", "search", "accessible"]
 features = [
   "blog",
