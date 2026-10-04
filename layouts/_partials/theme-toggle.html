@@ -1,5 +1,10 @@
 {{- /*
-  theme-toggle.html — cycles light → dark → system.
+  theme-toggle.html — the light/dark switch.
+
+  One click is one visible change: the handler walks to the next *appearance*
+  that differs from the one on screen (`nextMode` in modules/theme.js), so a
+  reader whose system is already light reaches dark on the first click instead of
+  spending that click re-selecting what they were looking at.
 
   The label is assembled from translated words carried in data attributes; the
   resolved theme is applied by the inline bootstrap in head/theme-init.html
@@ -16,7 +21,7 @@
     class="icon-button theme-toggle"
     type="button"
     data-theme-toggle
-    data-theme-value="light"
+    data-theme-value="system"
     data-label-theme="{{ T "theme" }}"
     data-label-light="{{ T "themeLight" }}"
     data-label-dark="{{ T "themeDark" }}"

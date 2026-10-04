@@ -8,6 +8,9 @@
  *
  * The resolved value is written to BOTH `data-theme` (our design tokens) and a
  * `light`/`dark` class (the Chroma stylesheets generated with --modeSelector).
+ *
+ * One click is always one visible change: see `nextMode`, which skips a state
+ * that would resolve to the appearance already on screen.
  */
 
 const STORAGE_KEY = 'hugo-scratch:theme';
@@ -29,6 +32,32 @@ export function resolveMode(mode) {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
   return mode === 'dark' ? 'dark' : 'light';
+}
+
+/**
+ * The next mode that actually CHANGES what is on screen.
+ *
+ * Three modes do not mean three appearances: `system` resolves to light or dark,
+ * so a stored-mode cycle of light → dark → system contains a step that looks
+ * like nothing happened. Measured on a light machine: the stored default is
+ * `system`, the first click pinned `light` — the very thing already on screen —
+ * and only the second click reached dark. Walking forward to the first candidate
+ * whose *resolved* theme differs makes one click one visible change, on a light
+ * machine and on a dark one alike.
+ *
+ * The consequence is deliberate: you cannot pin the theme you are already
+ * looking at, because there would be nothing to see. `system` remains reachable
+ * whenever it resolves to the other appearance.
+ */
+export function nextMode(mode) {
+  const current = resolveMode(mode);
+  for (let step = 1; step <= MODES.length; step += 1) {
+    const candidate = MODES[(MODES.indexOf(mode) + step) % MODES.length];
+    if (resolveMode(candidate) !== current) {
+      return candidate;
+    }
+  }
+  return MODES[(MODES.indexOf(mode) + 1) % MODES.length];
 }
 
 /** Apply a resolved theme to <html>. */
@@ -55,7 +84,7 @@ export function initTheme() {
     applyTheme(resolveMode(mode));
 
     if (!button) return;
-    const next = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+    const next = nextMode(mode);
     const labels = {
       light: button.dataset.labelLight || 'Light',
       dark: button.dataset.labelDark || 'Dark',
@@ -73,7 +102,7 @@ export function initTheme() {
 
   if (button) {
     button.addEventListener('click', () => {
-      const mode = MODES[(MODES.indexOf(getMode()) + 1) % MODES.length];
+      const mode = nextMode(getMode());
       storeMode(mode);
       sync(mode);
     });
