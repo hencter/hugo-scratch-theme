@@ -25,7 +25,14 @@
   {{ partial "head/verification.html" . }}
 
   {{ partial "head/theme-init.html" . }}
-  {{ partial "head/css.html" . }}
+  {{- /* Tailwind reads hugo_stats.json, which is only complete after every page
+       has been rendered, so the stylesheet MUST be built in a deferred template.
+       `key "global"` runs it once for the whole build (both languages share one
+       stylesheet). Calling head/css.html inline instead would compile against
+       the previous build's class list — or fail on a clean checkout. */ -}}
+  {{ with (templates.Defer (dict "key" "global")) }}
+    {{ partial "head/css.html" . }}
+  {{ end }}
   {{ partial "head/js.html" . }}
   {{ partial "head/schema.html" . }}
   {{ partial "analytics.html" . }}

@@ -45,7 +45,7 @@
   isHTML         = false
   notAlternative = true
 
-[outputformats.pagesjson]
+[outputformats.pages]
   mediaType      = 'application/json'
   baseName       = 'pages'
   isPlainText    = true

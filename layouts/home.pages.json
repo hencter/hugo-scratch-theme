@@ -12,6 +12,11 @@
 */ -}}
 {{- $pages := slice -}}
 
+{{- /* `.Site.Languages` is deprecated since 0.156; hugo.Sites is the supported
+       way to enumerate languages and it already carries each site's tag. */ -}}
+{{- $languages := slice -}}
+{{- range hugo.Sites }}{{ $languages = $languages | append .Language.Locale }}{{ end -}}
+
 {{- range site.Sections.ByWeight -}}
   {{- $pages = $pages | append (dict
         "kind" .Kind
@@ -67,7 +72,7 @@
         "description" site.Params.description
         "baseURL" site.BaseURL
         "language" site.Language.Locale
-        "languages" (apply site.Languages "index" "Lang")
+        "languages" $languages
         "pageCount" (len site.RegularPages))
       "pages" $pages -}}
 

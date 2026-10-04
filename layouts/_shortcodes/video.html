@@ -1,10 +1,17 @@
 {{- /*
   video — a self-hosted video with an optional poster frame.
 
-      {{< video src="demo.mp4" poster="demo.jpg" caption="A caption" >}}
+      {{< video src="/videos/demo.mp4" poster="/images/poster.png" caption="…" >}}
 
-  `preload="metadata"` and a poster keep the page light: the browser fetches the
-  first frames, not the whole file, until the reader presses play.
+  The shortcode checks that the file actually exists before emitting a <video>
+  element. A missing file would produce a player that silently shows nothing —
+  the kind of defect that survives a visual review. The check looks in both
+  places a static asset can live: resources.Get covers assets/, and
+  os.FileExists covers static/ (which Hugo copies verbatim and which therefore
+  never appears in the resource tree).
+
+  `preload="metadata"` plus a poster keeps the page light: the browser fetches
+  the first frames, not the whole file, until the reader presses play.
 */ -}}
 {{- $src := .Get "src" -}}
 {{- $poster := .Get "poster" -}}
@@ -12,10 +19,25 @@
 {{- if not $src -}}
   {{- errorf "shortcode `video` needs a src (%s)" .Position -}}
 {{- end -}}
-<figure class="figure video">
-  <video class="figure__media" controls preload="metadata" playsinline{{ with $poster }} poster="{{ . | absURL }}"{{ end }}>
-    <source src="{{ $src | absURL }}" type="video/mp4">
-    {{ T "videoUnsupported" }}
-  </video>
-  {{- with $caption }}<figcaption class="figure__caption">{{ . }}</figcaption>{{ end -}}
-</figure>
+{{- $clean := strings.TrimPrefix "/" $src -}}
+{{- $found := or (resources.Get $clean) (os.FileExists (path.Join "static" $clean)) -}}
+
+{{- if $found -}}
+  <figure class="figure video">
+    <video class="figure__media" controls preload="metadata" playsinline{{ with $poster }} poster="{{ . | absURL }}"{{ end }}>
+      <source src="{{ $src | absURL }}" type="video/mp4">
+      {{ T "videoUnsupported" }}
+    </video>
+    {{- with $caption }}<figcaption class="figure__caption">{{ . }}</figcaption>{{ end -}}
+  </figure>
+{{- else -}}
+  <div class="callout callout--warning">
+    <p class="callout__title">
+      {{- partial "icon.html" "alert" -}}
+      <span>{{ T "videoMissingTitle" }}</span>
+    </p>
+    <div class="callout__body">
+      <p>{{ printf (T "videoMissingBody") $src | safeHTML }}</p>
+    </div>
+  </div>
+{{- end -}}

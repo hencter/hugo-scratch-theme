@@ -71,7 +71,11 @@
 {{- with $page.Params.keywords }}{{ $main = merge $main (dict "keywords" .) }}{{ end -}}
 {{- if $page.IsPage -}}
   {{- $main = merge $main (dict "wordCount" $page.WordCount) -}}
-  {{- $main = merge $main (dict "timeRequired" (printf "PT%dM" (math.Max 1 $page.ReadingTime))) -}}
+  {{- /* ReadingTime is an int; `math.Max` would turn it into a float and
+         `%d` would then print "PT%!d(float64=1)M". */ -}}
+  {{- $minutes := $page.ReadingTime -}}
+  {{- if lt $minutes 1 }}{{ $minutes = 1 }}{{ end -}}
+  {{- $main = merge $main (dict "timeRequired" (printf "PT%dM" $minutes)) -}}
 {{- end -}}
 {{- with $page.Params.authors -}}
   {{- $people := slice -}}
@@ -101,4 +105,14 @@
   {{- $graph = $graph | append $main -}}
 {{- end -}}
 
-<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@graph" $graph | jsonify }}</script>
+{{- $json := dict "@context" "https://schema.org" "@graph" $graph | jsonify -}}
+{{- /* Two details decide whether this is valid JSON-LD or a useless string.
+       First, the payload must be inserted as JS rather than as a quoted string:
+       piping jsonify straight into a script element makes html/template wrap the
+       whole document in a JSON string literal, which every consumer rejects.
+       Second, a closing-tag sequence in the data is neutralised so the payload
+       can never close the script element early, even if a future Hugo stops
+       HTML-escaping jsonify output. Verified by reading the rendered page.
+       (No glob patterns in this comment: a slash-star sequence would end it.) */ -}}
+{{- $json = $json | replaceRE `</` `<\\/` -}}
+<script type="application/ld+json">{{ $json | safeJS }}</script>

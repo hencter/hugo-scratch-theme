@@ -1,39 +1,79 @@
 {{- /*
-  head/css.html — the entire CSS delivery pipeline.
+  head/css.html — the CSS pipeline: two compiled parts, one stylesheet.
 
-  Nothing here needs Node.js, PostCSS or a bundler config file:
+  PART 1 — the theme's design system (+ the site's own css/custom.css)
+      resources.Concat → css.Build    (lightningcss inlines every @import, and
+                                       resolves them through the asset tree, so
+                                       a file the SITE supplies is found)
+      → wrapped in `@layer components { … }`
 
-    resources.Get "css/main.css"   → the theme's entry stylesheet
-      | css.Build                  → inlines every @import into one file
-      | resources.Concat           → appends the site's own custom.css
-      | minify | fingerprint       → production build, with an SRI hash
+  PART 2 — Tailwind            resources.Get "css/tailwind.css" | css.TailwindCSS
 
-  Two sources are concatenated rather than one being overwritten. Theme and
-  project assets merge at FILE level: a site that shipped its own
-  assets/css/main.css would silently replace the theme's, so a site's additions
-  belong in a differently-named file. Calling it custom.css keeps the theme
-  upgradeable.
+  They are then concatenated in that order into ONE file, minified and
+  fingerprinted:
 
-  The `errorf` in the else-branch is deliberate: without it a missing asset
-  yields a site that merely renders unstyled, and nothing says why. A build that
-  stops with "theme asset … is missing" is cheaper to debug.
+      [tailwind output] [@layer components { design system }] → bundle.css
+
+  Why two parts rather than one entry file with everything in it: Tailwind's
+  CLI resolves imports relative to the directory Hugo runs in, so a single entry
+  cannot contain both `@import "tailwindcss/theme.css"` (a bare specifier only
+  Tailwind can resolve) and `@import "tokens.css"` (a relative path only Hugo's
+  fast inliner resolves). Splitting them gives each resolver the import kind it
+  understands.
+
+  The layer order lives in css/tailwind.css and is declared explicitly, so it
+  survives concatenation: theme < components < utilities. That is what lets a
+  Tailwind utility override one of the theme's component classes.
+
+  ⚠ This whole partial must run DEFERRED — Tailwind reads hugo_stats.json, which
+    only exists once every page has been rendered. See layouts/_partials/head.html.
+
+  Requirements the site must satisfy (all present in config/_default/hugo.toml):
+    · `npm ci` at the site root (tailwindcss + @tailwindcss/cli);
+    · [build.buildStats] enable = true and the hugo_stats.json mount;
+    · `tailwindcss` in [security.exec] allow.
 */ -}}
 
 {{- $dev := hugo.IsDevelopment -}}
-{{- $opts := dict "minify" false -}}
-{{- $parts := slice -}}
 
-{{- with resources.Get "css/main.css" -}}
-  {{- $parts = $parts | append (. | css.Build $opts) -}}
+{{- /* --- Part 1: the design system ------------------------------------- */ -}}
+{{- $dsParts := slice -}}
+{{- with resources.Get "css/design-system.css" -}}
+  {{- $dsParts = $dsParts | append . -}}
 {{- else -}}
-  {{- errorf "theme asset assets/css/main.css is missing — cannot build the stylesheet" -}}
+  {{- errorf "theme asset assets/css/design-system.css is missing — cannot build the stylesheet" -}}
 {{- end -}}
-
 {{- with resources.Get "css/custom.css" -}}
-  {{- $parts = $parts | append (. | css.Build $opts) -}}
+  {{- $dsParts = $dsParts | append . -}}
 {{- end -}}
 
-{{- $css := $parts | resources.Concat "css/bundle.css" -}}
+{{- $design := $dsParts
+      | resources.Concat "css/design-system-bundle.css"
+      | css.Build (dict "minify" false) -}}
+
+{{- /* Safe to wrap now: css.Build has resolved every @import, so what is left
+       is rules — and @layer may contain rules, just not @import. */ -}}
+{{- $layered := printf "@layer components {\n%s\n}\n" $design.Content
+      | resources.FromString "css/design-system-layered.css" -}}
+
+{{- /* --- Part 2: Tailwind ---------------------------------------------- */ -}}
+{{- $tailwindOpts := dict "minify" (not $dev) "optimize" $dev -}}
+{{- $tailwind := "" -}}
+{{- with resources.Get "css/tailwind.css" -}}
+  {{- $tailwind = . | css.TailwindCSS $tailwindOpts -}}
+{{- else -}}
+  {{- errorf "theme asset assets/css/tailwind.css is missing — cannot build the stylesheet" -}}
+{{- end -}}
+
+{{- /* --- One stylesheet ------------------------------------------------- */ -}}
+{{- /* The layer order must be the FIRST declaration in the bundle. Written
+       inside tailwind.css it ended up mid-file, and a layer statement only
+       fixes precedence when it precedes every layered block — measured with
+       `@layer` offsets over the built file, where `components` came out after
+       `utilities`. Prepending it as its own resource makes the order immune to
+       both the concatenation order and the minifier. */ -}}
+{{- $layerOrder := resources.FromString "css/00-layer-order.css" "@layer theme, components, utilities;\n" -}}
+{{- $css := slice $layerOrder $tailwind $layered | resources.Concat "css/bundle.css" -}}
 
 {{- if $dev -}}
   <link rel="stylesheet" href="{{ $css.RelPermalink }}">

@@ -38,7 +38,10 @@
   {{- if $rows }}
     {{ partial "page-list.html" (dict "pages" $rows "group" (default false .Params.groupByYear)) }}
   {{- else if not $subsections }}
-    <p class="page__empty">{{ T "noContent" }}</p>
+    {{- /* Only complain about emptiness when the section has nothing at all:
+           a section whose body already carries its own listing (the English
+           changelog, which renders data inline) must not be called empty. */ -}}
+    {{- if not .Content }}<p class="page__empty">{{ T "noContent" }}</p>{{ end }}
   {{- end }}
 
   {{ partial "pagination.html" $paginator }}

@@ -1,0 +1,52 @@
+{{- /*
+  changelog — render the release list straight from data/changelog.toml.
+
+      {{< changelog >}}
+
+  The same data also generates one real page per release through
+  content/changelog/_content.gotmpl. This shortcode exists for the case the
+  adapter cannot cover: a section in a NON-default language, where the generated
+  pages live in the default language only and linking to them would send the
+  reader across languages.
+
+  Bilingual convention: the base field is the default language, and
+  `title_<lang>` / `notes_<lang>` override it. `index` is used so that a missing
+  override is a miss rather than an error.
+*/ -}}
+{{- $lang := site.Language.Lang -}}
+{{- $titleKey := printf "title_%s" $lang -}}
+{{- $notesKey := printf "notes_%s" $lang -}}
+{{- $releases := hugo.Data.changelog.releases -}}
+{{- with $releases -}}
+  <ol class="release-list">
+    {{- range . }}
+      {{- $title := .title -}}
+      {{- with index . $titleKey }}{{ $title = . }}{{ end -}}
+      {{- $notes := .notes -}}
+      {{- with index . $notesKey }}{{ $notes = . }}{{ end -}}
+      {{- /* TOML dates arrive through hugo.Data as an untyped value, so a direct
+             `.date.Format` fails with "can't evaluate field Format in type
+             interface {}". time.AsTime normalises both a time.Time and the
+             ISO-8601 string TOML produces. */ -}}
+      {{- $raw := .date -}}
+      {{- $iso := printf "%v" $raw -}}
+      {{- $human := $iso -}}
+      {{- with time.AsTime $raw -}}
+        {{- $iso = .Format "2006-01-02" -}}
+        {{- $human = . | time.Format (site.Params.dateFormat | default ":date_long") -}}
+      {{- end -}}
+      <li class="release">
+        <p class="release__header">
+          <span class="badge badge--accent">{{ .version }}</span>
+          <time datetime="{{ $iso }}">{{ $human }}</time>
+        </p>
+        <p class="release__title">{{ $title }}</p>
+        <ul class="release__notes">
+          {{- range $notes }}<li>{{ . | safeHTML }}</li>{{ end -}}
+        </ul>
+      </li>
+    {{- end }}
+  </ol>
+{{- else -}}
+  <p>{{ T "noContent" }}</p>
+{{- end -}}

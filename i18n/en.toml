@@ -260,6 +260,12 @@ other = "Tabs"
 [videoUnsupported]
 other = "Your browser does not support embedded video."
 
+[videoMissingTitle]
+other = "Video file not found"
+
+[videoMissingBody]
+other = "No file at <code>%s</code>. Put it under <code>static/</code> or <code>assets/</code>, or pass a different <code>src</code>."
+
 # --- Status ---------------------------------------------------------------
 [draftBanner]
 other = "This page is a draft: it is excluded from production builds."

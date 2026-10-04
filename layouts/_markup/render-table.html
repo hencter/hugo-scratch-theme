@@ -8,6 +8,12 @@
   middle of the markup.
 
   Block attributes from `{...#id .class}` land on the <table> element.
+
+  ⚠ The context is `tables.tableContext` and in Hugo 0.167 it exposes exactly
+    these fields: Attributes, Ordinal, Page, PageInner, Position, THead, TBody.
+    There is NO footer field — `.TFoot` (and `.Foot`) abort the build with
+    "can't evaluate field TFoot in type tables.tableContext". A Markdown table
+    cannot have a footer, so nothing is lost.
 */ -}}
 <div class="table-wrap">
   <table{{ range $k, $v := .Attributes }} {{ $k }}="{{ $v }}"{{ end }}>
@@ -32,17 +38,6 @@
           </tr>
         {{- end }}
       </tbody>
-    {{- end }}
-    {{- with .TFoot }}
-      <tfoot>
-        {{- range . }}
-          <tr>
-            {{- range . }}
-              <td{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text | safeHTML }}</td>
-            {{- end }}
-          </tr>
-        {{- end }}
-      </tfoot>
     {{- end }}
   </table>
 </div>

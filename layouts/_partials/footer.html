@@ -8,7 +8,7 @@
 */ -}}
 {{- $links := slice -}}
 {{- with site.Home.OutputFormats.Get "llms" }}{{ $links = $links | append (dict "label" "llms.txt" "href" .RelPermalink) }}{{ end -}}
-{{- with site.Home.OutputFormats.Get "pagesjson" }}{{ $links = $links | append (dict "label" "pages.json" "href" .RelPermalink) }}{{ end -}}
+{{- with site.Home.OutputFormats.Get "pages" }}{{ $links = $links | append (dict "label" "pages.json" "href" .RelPermalink) }}{{ end -}}
 {{- with site.Home.OutputFormats.Get "sitemap" }}{{ $links = $links | append (dict "label" "sitemap.xml" "href" .RelPermalink) }}{{ end -}}
 {{- with site.Home.OutputFormats.Get "rss" }}{{ $links = $links | append (dict "label" "index.xml" "href" .RelPermalink) }}{{ end -}}
 {{- with site.Home.OutputFormats.Get "md" }}{{ $links = $links | append (dict "label" "index.md" "href" .RelPermalink) }}{{ end -}}

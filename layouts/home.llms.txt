@@ -43,7 +43,7 @@
 {{ end -}}
 ## Machine-readable
 
-- [pages.json]({{ with site.Home.OutputFormats.Get "pagesjson" }}{{ .Permalink }}{{ end }}): every page with its role, dates and difficulty, for planning a reading order.
+- [pages.json]({{ with site.Home.OutputFormats.Get "pages" }}{{ .Permalink }}{{ end }}): every page with its role, dates and difficulty, for planning a reading order.
 - [search.json]({{ with site.Home.OutputFormats.Get "search" }}{{ .Permalink }}{{ end }}): title, description, tags and a body excerpt per page.
 - [sitemap.xml]({{ "sitemap.xml" | absURL }}): canonical URLs.
 - [index.xml]({{ with site.Home.OutputFormats.Get "rss" }}{{ .Permalink }}{{ end }}): the feed.

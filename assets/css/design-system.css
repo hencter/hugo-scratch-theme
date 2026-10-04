@@ -1,0 +1,32 @@
+/* ==========================================================================
+   design-system.css — this theme's own stylesheet entry point
+   --------------------------------------------------------------------------
+   Compiled by Hugo Pipes:
+
+       resources.Concat (this file + the site's css/custom.css)
+         | css.Build        → inlines every @import below into one file
+         | wrapped in @layer components { … } by layouts/_partials/head/css.html
+         | concatenated after the Tailwind output
+         | minify | fingerprint "sha384"
+
+   `css.Build` (lightningcss) resolves the relative imports against the asset
+   tree this file lives in, which is why a SITE-provided assets/css/custom.css
+   can be concatenated in without the theme knowing about it.
+
+   The layer wrapper is applied by the template rather than written here for a
+   concrete reason: after `css.Build` there are no @import statements left, so
+   the result is pure rules — and pure rules can be wrapped in a layer safely.
+   Wrapping *this* file directly would nest @import inside @layer, which is not
+   a valid stylesheet.
+   ========================================================================== */
+
+@import "tokens.css";
+@import "chroma-light.css";
+@import "chroma-dark.css";
+@import "base.css";
+@import "layout.css";
+@import "components.css";
+@import "content.css";
+@import "blocks.css";
+@import "releases.css";
+@import "print.css";

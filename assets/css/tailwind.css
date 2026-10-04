@@ -1,0 +1,56 @@
+/* ==========================================================================
+   tailwind.css — the Tailwind CSS v4 entry point
+   --------------------------------------------------------------------------
+   Compiled by Hugo's official integration:
+
+       resources.Get "css/tailwind.css" | css.TailwindCSS
+
+   The function runs the Tailwind CLI (installed with npm at the SITE root),
+   which expands these imports, scans the configured sources, and emits only the
+   utilities this site actually uses.
+
+   --------------------------------------------------------------------------
+   Layers
+   --------------------------------------------------------------------------
+   The order is  theme < components < utilities.
+
+   It is NOT declared in this file. `layouts/_partials/head/css.html` prepends
+   the statement `@layer theme, components, utilities;` as its own resource, as
+   the very first thing in the bundle. Declaring it here was not enough: the
+   minifier rewrote a mid-file statement, and a layer statement only fixes
+   precedence when it precedes every layered block in the file. With it pinned
+   first, the browser cannot order the layers by first encounter.
+
+   Without it, the theme's `components` block — concatenated after the Tailwind
+   output — would sit below `utilities`, and `class="mt-0"` would lose to
+   `.prose p { margin }` for reasons no one can see.
+
+   `preflight` is deliberately not imported: this theme ships its own reset
+   (base.css) and its own element styling, and Tailwind's preflight would
+   silently strip list markers, button styling and form styling the design
+   relies on. Adding it back is one line, plus `base` in the layer order:
+
+       @import "tailwindcss/preflight.css" layer(base);
+
+   (and add `base` to the prepended statement, before `components`).
+   ========================================================================== */
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* --------------------------------------------------------------------------
+   What Tailwind scans.
+   Automatic content detection already walks the project — including the theme's
+   templates — but it respects .gitignore, and hugo_stats.json is ignored on
+   purpose. Naming it here is what makes it visible: hugo_stats.json holds the
+   class names that appeared in the RENDERED HTML, which is the only source that
+   knows about a class assembled in content or in front matter.
+
+   The path is relative to the directory Hugo runs in (the project root), not to
+   this file: Hugo pipes the stylesheet to the CLI, so the CLI has no file
+   location to resolve against. Measured, not assumed — an earlier
+   `@source "../notwatching/hugo_stats.json"` and a `disableInlineImports = true`
+   in head/css.html both produced
+   "Error: Can't resolve 'tokens.css' in '<project root>'".
+   -------------------------------------------------------------------------- */
+@source "hugo_stats.json";

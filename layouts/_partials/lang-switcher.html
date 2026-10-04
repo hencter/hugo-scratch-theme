@@ -7,7 +7,7 @@
   defect, and it is invisible in a two-language demo where every page is
   translated.
 
-  `site.Sites` lists every language site, including the current one, so the
+  `hugo.Sites` lists every language site, including the current one, so the
   control renders identically on every page.
 */ -}}
 {{- if hugo.IsMultilingual -}}
@@ -15,7 +15,7 @@
   {{- $current := site.Language.Lang -}}
   <nav class="lang-switcher" aria-label="{{ T "switchLanguage" }}">
     <ul class="lang-switcher__list">
-      {{- range site.Sites -}}
+      {{- range hugo.Sites -}}
         {{- $lang := .Language.Lang -}}
         {{- $url := .Home.RelPermalink -}}
         {{- with $page.Translations -}}
@@ -29,7 +29,7 @@
             href="{{ $url }}"
             hreflang="{{ .Language.Locale }}"
             lang="{{ .Language.Locale }}"
-            {{ if eq $lang $current }}aria-current="true"{{ end }}>{{ .Language.LanguageName }}</a>
+            {{ if eq $lang $current }}aria-current="true"{{ end }}>{{ .Language.Label }}</a>
         </li>
       {{- end -}}
     </ul>

@@ -18,6 +18,11 @@
 {{- $sep := site.Params.titleSeparator | default "·" -}}
 {{- $seo := site.Params.seo | default dict -}}
 
+{{- /* Pagination exists only on these kinds. Probing .Paginator anywhere else
+       (404, robots.txt, the sitemap page, a regular page) is a hard error:
+       "pagination not supported for this page". */ -}}
+{{- $paginated := in (slice "section" "taxonomy" "term") $page.Kind -}}
+
 {{- /* --- Title ------------------------------------------------------- */ -}}
 {{- $title := "" -}}
 {{- if $page.IsHome -}}
@@ -27,7 +32,7 @@
   {{- $title = printf "%s %s %s" $page.Title $sep site.Title -}}
 {{- end -}}
 
-{{- if and $page.IsNode (ne $page.Kind "home") -}}
+{{- if $paginated -}}
   {{- with $page.Paginator -}}
     {{- if gt .PageNumber 1 -}}
       {{- $title = printf "%s %s %s" $title $sep (T "pageNumber" .) -}}
@@ -48,7 +53,7 @@
 
 {{- /* --- Canonical --------------------------------------------------- */ -}}
 {{- $canonical := $page.Permalink -}}
-{{- if and $page.IsNode (ne $page.Kind "home") -}}
+{{- if $paginated -}}
   {{- with $page.Paginator -}}
     {{- if gt .PageNumber 1 }}{{ $canonical = .URL | absURL }}{{ end -}}
   {{- end -}}
@@ -76,9 +81,6 @@
 {{- with $author }}
 <meta name="author" content="{{ . }}">
 {{ end -}}
-{{- with $page.Date }}{{ if not .IsZero }}
-<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05-07:00" }}">
-{{ end }}{{ end -}}
-{{- if not $page.Lastmod.IsZero }}
-<meta property="article:modified_time" content="{{ $page.Lastmod.Format "2006-01-02T15:04:05-07:00" }}">
-{{ end -}}
+{{- /* article:published_time / article:modified_time are emitted by
+       head/opengraph.html together with the rest of the article metadata.
+       Emitting them here as well would duplicate every tag. */ -}}

@@ -5,9 +5,14 @@
   application/json file, so there is no HTML escaping to reason about and the
   browser can fetch it with a normal JSON parser.
 
-  `body` is a truncated plain-text projection of the page. Matching is substring
-  based (see assets/js/modules/search.js) because word-boundary matching does
-  not exist for Chinese, Japanese or Korean text.
+  `body` is a truncated projection of the page. `.RawContent` is used rather
+  than `.Plain`: `.Plain` is derived from the RENDERED HTML, so it picks up text
+  the theme's own render hooks inject — heading anchor "#", the code-block copy
+  button label and every code block's language name. The raw source is the
+  author's words only.
+
+  Matching is substring based (see assets/js/modules/search.js) because
+  word-boundary matching does not exist for Chinese, Japanese or Korean text.
 */ -}}
 {{- $index := slice -}}
 
@@ -34,7 +39,7 @@
         "description" (.Description | default (.Summary | plainify | truncate 160))
         "tags" $tags
         "date" $date
-        "body" (.Plain | truncate 2000)) -}}
+        "body" (.RawContent | truncate 3000)) -}}
 {{- end -}}
 
 {{- $index | jsonify -}}

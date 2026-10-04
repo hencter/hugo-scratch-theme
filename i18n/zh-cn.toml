@@ -256,6 +256,12 @@ other = "标签页"
 [videoUnsupported]
 other = "你的浏览器不支持内嵌视频。"
 
+[videoMissingTitle]
+other = "视频文件不存在"
+
+[videoMissingBody]
+other = "找不到文件 <code>%s</code>：把它放进 <code>static/</code> 或 <code>assets/</code>，或者换一个 <code>src</code>。"
+
 # --- 状态 -----------------------------------------------------------------
 [draftBanner]
 other = "本页是草稿：生产构建不会包含它。"

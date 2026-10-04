@@ -48,13 +48,14 @@
   {{ partial "page-nav.html" . }}
 
   {{- /* Alternative representations of THIS page. */ -}}
+  {{- $edit := site.Params.editURL -}}
+  {{- $file := .File -}}
   <p class="page__sources">
     {{- with .OutputFormats.Get "md" }}
       <a href="{{ .RelPermalink }}">{{ T "markdownSource" }}</a>
     {{- end }}
-    {{- $edit := site.Params.editURL -}}
-    {{- with .File }}
-      {{- with $edit }}
+    {{- with $edit }}
+      {{- with $file }}
         · <a href="{{ printf "%s/%s" $edit .Path }}" rel="noopener">{{ T "editThisPage" }}</a>
       {{- end }}
     {{- end }}
