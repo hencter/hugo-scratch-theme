@@ -1,0 +1,32 @@
+{{- /*
+  head/alternates.html — machine-discoverable versions of THIS page.
+
+  a) Alternative output formats. Hugo exposes `.AlternativeOutputFormats`,
+     which is every format in [outputs] that did NOT set notAlternative = true.
+     Here that is RSS and the Markdown mirror (/index.md), so an agent can fetch
+     the source instead of scraping HTML.
+
+  b) hreflang. `.AllTranslations` always includes the current language, so the
+     loop is skipped entirely for a single-language site. `x-default` points at
+     the page in the language named by params.seo.xDefaultLang — guessing it
+     from site.Languages order would break as soon as a language is added.
+*/ -}}
+
+{{- $page := . -}}
+
+{{- range $page.AlternativeOutputFormats -}}
+  <link rel="alternate" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $page.Title }}">
+{{ end -}}
+
+{{- if gt (len $page.AllTranslations) 1 -}}
+  {{- range $page.AllTranslations -}}
+    <link rel="alternate" hreflang="{{ .Language.Locale }}" href="{{ .Permalink | safeURL }}">
+  {{ end -}}
+  {{- $seo := site.Params.seo | default dict -}}
+  {{- $default := index $seo "xDefaultLang" | default site.Language.Lang -}}
+  {{- range $page.AllTranslations -}}
+    {{- if eq .Language.Lang $default -}}
+      <link rel="alternate" hreflang="x-default" href="{{ .Permalink | safeURL }}">
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

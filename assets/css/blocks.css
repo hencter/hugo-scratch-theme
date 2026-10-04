@@ -1,0 +1,236 @@
+/* ==========================================================================
+   Blocks — layout for the pieces the templates and shortcodes emit
+   ========================================================================== */
+
+/* --- Home page ----------------------------------------------------------- */
+.home__intro {
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+}
+
+.home__block {
+  margin-top: var(--space-7);
+}
+
+.home__heading {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xl);
+}
+
+/* --- Year grouping in list output --------------------------------------- */
+.year-group {
+  margin-top: var(--space-6);
+}
+
+.year-group__title {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Solo (no sidebar, no toc) layout ------------------------------------ */
+.layout--solo {
+  justify-items: center;
+}
+
+.layout--solo .page {
+  width: 100%;
+}
+
+/* --- Sidebar heading link ------------------------------------------------ */
+.sidebar__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar__title a:hover {
+  color: var(--color-accent);
+}
+
+/* --- Theme toggle: exactly one icon is in flow at a time ----------------- */
+.theme-toggle__icon {
+  display: none;
+}
+
+[data-theme="light"] .theme-toggle__icon--light,
+[data-theme="dark"] .theme-toggle__icon--dark {
+  display: inline-flex;
+}
+
+/* --- Language switcher --------------------------------------------------- */
+.lang-switcher__list {
+  display: flex;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lang-switcher__link {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.lang-switcher__link:hover {
+  background-color: var(--color-bg-inset);
+  color: var(--color-text);
+}
+
+.lang-switcher__link[aria-current="true"] {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* --- Page furniture ------------------------------------------------------ */
+.page__meta {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.page__empty {
+  color: var(--color-text-muted);
+}
+
+.page__taxonomies {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.page__taxonomy-title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page__sources {
+  margin-top: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.section__children {
+  margin-block: var(--space-6);
+}
+
+.section__heading {
+  font-size: var(--text-xl);
+}
+
+.callout__body > :last-child {
+  margin-bottom: 0;
+}
+
+.tabs__panels {
+  background-color: var(--color-surface);
+}
+
+.pagination__item--gap {
+  border-color: transparent;
+  color: var(--color-text-faint);
+}
+
+.comments {
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+/* --- Columns shortcode --------------------------------------------------- */
+.columns {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-block: var(--space-5);
+}
+
+@media (max-width: 40rem) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.columns__item > :last-child {
+  margin-bottom: 0;
+}
+
+/* --- File tree shortcode ------------------------------------------------- */
+.filetree {
+  margin-block: var(--space-5);
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-code-bg);
+}
+
+.filetree pre {
+  margin: 0;
+  padding: var(--space-4);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+/* --- Video --------------------------------------------------------------- */
+.video video,
+.video > .figure__media {
+  display: block;
+  width: 100%;
+}
+
+.video-link {
+  margin-block: var(--space-5);
+}
+
+.video-link__anchor {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.video-link__anchor:hover {
+  border-color: var(--color-accent);
+}
+
+.video-link__play {
+  color: var(--color-accent);
+}
+
+/* --- Column alignment, emitted by render-table.html ---------------------- */
+.prose .align-center {
+  text-align: center;
+}
+
+.prose .align-right {
+  text-align: right;
+}
+
+.prose .align-left {
+  text-align: left;
+}
+
+/* --- Section index header ------------------------------------------------ */
+.section-header {
+  margin-bottom: var(--space-6);
+}

@@ -1,0 +1,37 @@
+{{- /*
+  toc.html — "on this page" navigation.
+
+  Built from `.Fragments.Headings`, NOT from `.TableOfContents`:
+
+    · .Fragments gives the parsed structure, so the markup (and therefore the
+      accessibility semantics and the anchor markup) is ours;
+    · .TableOfContents returns a pre-rendered <nav> string with fixed classes,
+      which cannot carry aria-current or be styled as part of this design.
+
+  Both are legitimate; the docs chapter on render hooks shows .TableOfContents
+  side by side with this, and the scroll spy in assets/js/modules/toc.js sets
+  aria-current="true" on the heading the reader is looking at.
+*/ -}}
+
+{{- $flags := partial "layout/flags.html" . -}}
+{{- if $flags.toc -}}
+  {{- $headings := slice -}}
+  {{- with .Fragments -}}{{- with .Headings -}}{{- $headings = . -}}{{- end -}}{{- end -}}
+  <nav class="toc" aria-labelledby="toc-heading" data-toc>
+    <p class="sidebar__title" id="toc-heading">{{ T "onThisPage" }}</p>
+    {{- partial "inline/toc/tree.html" (dict "headings" $headings) -}}
+  </nav>
+{{- end -}}
+
+{{- define "_partials/inline/toc/tree.html" -}}
+  <ul class="toc__list">
+    {{- range .headings -}}
+      <li>
+        <a class="toc__link" href="#{{ .ID }}">{{ .Title | plainify }}</a>
+        {{- with .Headings -}}
+          {{- partial "inline/toc/tree.html" (dict "headings" .) -}}
+        {{- end -}}
+      </li>
+    {{- end -}}
+  </ul>
+{{- end -}}

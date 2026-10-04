@@ -1,0 +1,25 @@
+{{- /*
+  mermaid — a diagram description.
+
+  Off by default, and that default is visible rather than silent:
+
+    · params.mermaid.enabled = true  → <pre class="mermaid">, which expects the
+      site to load the mermaid runtime (the theme does not: a diagram library is
+      a large third-party script and belongs to the site's decision).
+    · otherwise                      → the same source, syntax-highlighted as a
+      code block, so the page stays readable and nothing breaks.
+
+  There is no way to render mermaid at BUILD time, so a shortcode that always
+  emitted <pre class="mermaid"> would silently produce unstyled text on every
+  site that never loaded the runtime.
+*/ -}}
+{{- $enabled := false -}}
+{{- with site.Params.mermaid -}}
+  {{- if .enabled }}{{ $enabled = true }}{{ end -}}
+{{- end -}}
+{{- $code := trim .Inner "\n\r" -}}
+{{- if $enabled -}}
+  <pre class="mermaid">{{ $code }}</pre>
+{{- else -}}
+  {{- transform.Highlight $code "mermaid" -}}
+{{- end -}}

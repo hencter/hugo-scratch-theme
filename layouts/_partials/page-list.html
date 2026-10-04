@@ -1,0 +1,41 @@
+{{- /*
+  page-list.html — a flat or year-grouped list of pages.
+
+  @context {dict} "pages" (page collection) "group" (bool, optional)
+
+  Grouping uses `collections.GroupByPublishDate`, which is one of the collection
+  functions that returns a NESTED structure. The obvious `where`/`sort`
+  combination cannot group at all, which is why this looks different from every
+  other list in the theme.
+*/ -}}
+
+{{- $pages := .pages -}}
+{{- $fmt := site.Params.dateFormat | default ":date_long" -}}
+
+{{- if .group -}}
+  {{- range $pages.GroupByPublishDate "2006" }}
+    <section class="year-group" aria-labelledby="year-{{ .Key }}">
+      <h2 class="year-group__title" id="year-{{ .Key }}">{{ .Key }}</h2>
+      <ul class="post-list">
+        {{- range .Pages }}{{ partial "inline/page-list/row.html" (dict "page" . "fmt" $fmt) }}{{ end -}}
+      </ul>
+    </section>
+  {{- end -}}
+{{- else -}}
+  <ul class="post-list">
+    {{- range $pages }}{{ partial "inline/page-list/row.html" (dict "page" . "fmt" $fmt) }}{{ end -}}
+  </ul>
+{{- end -}}
+
+{{- define "_partials/inline/page-list/row.html" -}}
+  {{- $entry := .page -}}
+  {{- $fmt := .fmt -}}
+  <li class="post-list__item">
+    <h3 class="post-list__title"><a href="{{ $entry.RelPermalink }}">{{ $entry.LinkTitle }}</a></h3>
+    {{- if not $entry.Date.IsZero }}
+      <time class="post-list__date" datetime="{{ $entry.Date.Format "2006-01-02" }}">{{ $entry.Date | time.Format $fmt }}</time>
+    {{- else if $entry.IsSection }}
+      <span class="post-list__date">{{ T "pageCount" (len $entry.RegularPagesRecursive) }}</span>
+    {{- end }}
+  </li>
+{{- end -}}

@@ -1,0 +1,30 @@
+{{- /*
+  render-codeblock.html — every fenced code block goes through here.
+
+  `transform.HighlightCodeBlock .` does the Chroma work and returns both the
+  highlighted inner HTML and a ready-wrapped variant. Building the wrapper here
+  instead buys three things the default cannot:
+
+    · the language label, so a reader knows what they are looking at;
+    · `{filename="…"}` from the fence info string, shown in the header;
+    · a copy button — rendered server-side, so it is present even when the
+      bundle fails to load (assets/js/modules/copy.js only makes it work).
+
+  `noClasses = false` in the config is what makes Chroma emit class names
+  instead of inline styles; without it this hook would still work, but the
+  colours could not follow the light/dark theme.
+*/ -}}
+{{- $result := transform.HighlightCodeBlock . -}}
+{{- $lang := .Type | default "text" -}}
+{{- $filename := "" -}}
+{{- with .Options -}}
+  {{- with index . "filename" }}{{ $filename = . }}{{ end -}}
+{{- end -}}
+<div class="highlight">
+  <div class="highlight__header">
+    <span class="highlight__lang">{{ $lang }}</span>
+    {{- with $filename }}<span class="highlight__filename">{{ . }}</span>{{ end }}
+    <button class="copy-button" type="button" data-copy-code>{{ T "copy" }}</button>
+  </div>
+  {{ $result.Inner }}
+</div>

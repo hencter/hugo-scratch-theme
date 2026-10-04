@@ -1,0 +1,36 @@
+{{- /*
+  figure — overrides Hugo's built-in shortcode.
+
+  Two things the built-in version cannot do that a real site needs:
+
+    · resolve the image through the SAME helper the render hook and the Open
+      Graph tags use, so a page-resource image works in all three places;
+    · emit `loading="lazy"` and `decoding="async"`, and pass through the
+      intrinsic width/height that Hugo read from the file — which is what stops
+      the layout from jumping while the image loads.
+
+      {{< figure src="photo.jpg" alt="A photo" caption="Taken in 2026" class="figure--right" >}}
+*/ -}}
+{{- $src := .Get "src" -}}
+{{- $alt := .Get "alt" -}}
+{{- $caption := .Get "caption" -}}
+{{- $class := .Get "class" -}}
+{{- $link := .Get "link" -}}
+{{- $maxWidth := .Get "width" -}}
+{{- if not $src -}}
+  {{- errorf "shortcode `figure` needs a src (%s)" .Position -}}
+{{- end -}}
+{{- $image := partial "resolve-image.html" (dict "page" .Page "src" $src) -}}
+<figure class="figure{{ with $class }} {{ . }}{{ end }}">
+  {{- if $link }}<a href="{{ $link }}">{{ end -}}
+  <img
+    class="figure__media"
+    src="{{ $image.url }}"
+    alt="{{ $alt | default "" }}"
+    {{- if gt $image.width 0 }} width="{{ $image.width }}" height="{{ $image.height }}"{{ end }}
+    {{- with $maxWidth }} style="max-width: {{ . }}px"{{ end }}
+    loading="lazy"
+    decoding="async">
+  {{- if $link }}</a>{{ end -}}
+  {{- with $caption }}<figcaption class="figure__caption">{{ . | markdownify }}</figcaption>{{ end -}}
+</figure>

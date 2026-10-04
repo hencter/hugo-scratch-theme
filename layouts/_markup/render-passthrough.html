@@ -1,0 +1,16 @@
+{{- /*
+  render-passthrough.html — LaTeX and other maths delimiters.
+
+  Goldmark's passthrough extension hands the delimiters through untouched; this
+  hook wraps them so a client-side renderer (KaTeX, MathJax) can find them.
+
+  The theme deliberately does NOT load such a renderer: it is a large
+  third-party script, and a site that never writes maths should not pay for it.
+  Without a renderer the reader sees the LaTeX source, which is honest and still
+  meaningful — the alternative, emitting markup that looks broken, is not.
+*/ -}}
+{{- if eq .Type "block" -}}
+  <div class="math-block">{{ .Inner }}</div>
+{{- else -}}
+  <code class="math">{{ .Inner }}</code>
+{{- end -}}

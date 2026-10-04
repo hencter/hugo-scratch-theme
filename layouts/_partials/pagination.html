@@ -1,0 +1,55 @@
+{{- /*
+  pagination.html — paginator control.
+
+  @context {pager} Paginator
+  @example {{ partial "pagination.html" .Paginator }}
+
+  The windowed branch exists because an archive with 60 pages must not render 60
+  links. Below eight pages every number fits, so the short branch keeps the
+  markup simple; above it, only the first, last and a window around the current
+  page are shown, with an ellipsis marking each gap.
+*/ -}}
+
+{{- $p := . -}}
+{{- if gt $p.TotalPages 1 -}}
+  {{- $current := $p.PageNumber -}}
+  {{- $total := $p.TotalPages -}}
+  {{- $window := 2 -}}
+  <nav class="pagination" aria-label="{{ T "pagination" }}">
+    {{- with $p.Prev -}}
+      <a class="pagination__item" href="{{ .URL }}" rel="prev">{{ T "previous" }}</a>
+    {{- else -}}
+      <span class="pagination__item" aria-disabled="true">{{ T "previous" }}</span>
+    {{- end -}}
+
+    {{- if le $total 8 -}}
+      {{- range $p.Pagers -}}
+        {{- if eq .PageNumber $current -}}
+          <span class="pagination__item" aria-current="page">{{ .PageNumber }}</span>
+        {{- else -}}
+          <a class="pagination__item" href="{{ .URL }}">{{ .PageNumber }}</a>
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{- range $p.Pagers -}}
+        {{- $n := .PageNumber -}}
+        {{- $inWindow := and (ge $n (sub $current $window)) (le $n (add $current $window)) -}}
+        {{- if or (eq $n 1) (eq $n $total) $inWindow -}}
+          {{- if eq $n $current -}}
+            <span class="pagination__item" aria-current="page">{{ $n }}</span>
+          {{- else -}}
+            <a class="pagination__item" href="{{ .URL }}">{{ $n }}</a>
+          {{- end -}}
+        {{- else if or (eq $n (sub $current (add $window 1))) (eq $n (add $current (add $window 1))) -}}
+          <span class="pagination__item pagination__item--gap" aria-hidden="true">…</span>
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- with $p.Next -}}
+      <a class="pagination__item" href="{{ .URL }}" rel="next">{{ T "next" }}</a>
+    {{- else -}}
+      <span class="pagination__item" aria-disabled="true">{{ T "next" }}</span>
+    {{- end -}}
+  </nav>
+{{- end -}}

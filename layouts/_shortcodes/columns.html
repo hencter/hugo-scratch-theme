@@ -1,0 +1,13 @@
+{{- /*
+  columns — a responsive multi-column row. Markdown notation:
+
+      {{% columns cols=2 %}}
+      {{% column %}}Left{{% /column %}}
+      {{% column %}}Right{{% /column %}}
+      {{% /columns %}}
+
+  The column count is exposed as a custom property rather than as floats, so
+  the CSS decides when to collapse to one column on a narrow screen.
+*/ -}}
+{{- $cols := .Get "cols" | default 2 -}}
+<div class="columns" style="--columns: {{ $cols }}">{{ .Inner }}</div>

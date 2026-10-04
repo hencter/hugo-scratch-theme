@@ -1,0 +1,104 @@
+{{- /*
+  head/schema.html — JSON-LD structured data as a single @graph.
+
+  One <script type="application/ld+json"> with a @graph is preferred over many
+  scripts: the nodes reference each other by @id, and a consumer can resolve the
+  publisher of an article without a second fetch.
+
+  Why this is written as `{{ $graph | jsonify }}` and not `{{ partial … | jsonify }}`:
+
+    Hugo's `jsonify` marshals an OBJECT. Wrapping it — for example piping a
+    partial's output through `jsonify` — turns the whole payload into a JSON
+    STRING literal, and every consumer then rejects it. Hand the template the
+    object, let jsonify do the encoding.
+
+  Go's json encoder escapes <, > and & as \u003c, \u003e and \u0026, so the
+  output cannot terminate the <script> element early. That is also why plain
+  jsonify is correct here even though the surrounding context is a script tag.
+*/ -}}
+
+{{- $page := . -}}
+{{- $home := site.Home -}}
+{{- $seo := site.Params.seo | default dict -}}
+{{- $orgName := index $seo "organization" | default site.Title -}}
+{{- $orgID := printf "%s#organization" $home.Permalink -}}
+{{- $siteID := printf "%s#website" $home.Permalink -}}
+
+{{- /* --- Organization -------------------------------------------------- */ -}}
+{{- $org := dict "@type" "Organization" "@id" $orgID "name" $orgName "url" $home.Permalink -}}
+{{- with index $seo "logo" -}}
+  {{- $logo := partial "resolve-image.html" (dict "page" $home "src" .) -}}
+  {{- if $logo.url -}}
+    {{- $org = merge $org (dict "logo" (dict "@type" "ImageObject" "url" $logo.url)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* --- WebSite (+ SearchAction when the search index exists) ---------- */ -}}
+{{- $website := dict
+      "@type" "WebSite"
+      "@id" $siteID
+      "url" $home.Permalink
+      "name" site.Title
+      "inLanguage" site.Language.Locale
+      "publisher" (dict "@id" $orgID) -}}
+{{- with site.Home.OutputFormats.Get "search" -}}
+  {{- $website = merge $website (dict "potentialAction" (dict
+        "@type" "SearchAction"
+        "target" (dict
+          "@type" "EntryPoint"
+          "urlTemplate" (printf "%ssearch?q={search_term_string}" $home.Permalink))
+        "query-input" "required name=search_term_string")) -}}
+{{- end -}}
+
+{{- /* --- The page itself ----------------------------------------------- */ -}}
+{{- $type := "WebPage" -}}
+{{- if not $page.IsPage -}}
+  {{- $type = cond $page.IsHome "WebSite" "CollectionPage" -}}
+{{- else if and (eq $page.Section "blog") (not $page.Date.IsZero) -}}
+  {{- $type = "BlogPosting" -}}
+{{- end -}}
+
+{{- $main := dict
+      "@type" $type
+      "@id" (printf "%s#page" $page.Permalink)
+      "url" $page.Permalink
+      "name" $page.Title
+      "isPartOf" (dict "@id" $siteID)
+      "inLanguage" site.Language.Locale -}}
+{{- with $page.Description }}{{ $main = merge $main (dict "description" (. | plainify)) }}{{ end -}}
+{{- if not $page.Date.IsZero }}{{ $main = merge $main (dict "datePublished" ($page.Date.Format "2006-01-02T15:04:05-07:00")) }}{{ end -}}
+{{- if not $page.Lastmod.IsZero }}{{ $main = merge $main (dict "dateModified" ($page.Lastmod.Format "2006-01-02T15:04:05-07:00")) }}{{ end -}}
+{{- with $page.Params.keywords }}{{ $main = merge $main (dict "keywords" .) }}{{ end -}}
+{{- if $page.IsPage -}}
+  {{- $main = merge $main (dict "wordCount" $page.WordCount) -}}
+  {{- $main = merge $main (dict "timeRequired" (printf "PT%dM" (math.Max 1 $page.ReadingTime))) -}}
+{{- end -}}
+{{- with $page.Params.authors -}}
+  {{- $people := slice -}}
+  {{- range . }}{{ $people = $people | append (dict "@type" "Person" "name" .) }}{{ end -}}
+  {{- $main = merge $main (dict "author" (cond (eq (len $people) 1) (index $people 0) $people)) -}}
+{{- end -}}
+{{- with $page.Params.images -}}
+  {{- $img := partial "resolve-image.html" (dict "page" $page "src" (index . 0)) -}}
+  {{- if $img.url }}{{ $main = merge $main (dict "image" $img.url) }}{{ end -}}
+{{- end -}}
+
+{{- /* --- Breadcrumbs ---------------------------------------------------- */ -}}
+{{- $graph := slice $org $website -}}
+{{- if not $page.IsHome -}}
+  {{- $items := slice -}}
+  {{- $position := 1 -}}
+  {{- range $page.Ancestors.Reverse -}}
+    {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" .Title "item" .Permalink) -}}
+    {{- $position = add $position 1 -}}
+  {{- end -}}
+  {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" $page.Title "item" $page.Permalink) -}}
+  {{- $graph = $graph | append $main (dict
+        "@type" "BreadcrumbList"
+        "@id" (printf "%s#breadcrumb" $page.Permalink)
+        "itemListElement" $items) -}}
+{{- else -}}
+  {{- $graph = $graph | append $main -}}
+{{- end -}}
+
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@graph" $graph | jsonify }}</script>

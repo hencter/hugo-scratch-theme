@@ -1,0 +1,10 @@
+{{- /*
+  filetree — a directory listing with the indentation the author typed.
+
+  Standard notation on purpose: the content must NOT go through the Markdown
+  renderer, because leading whitespace, `*` and `-` are exactly what a file tree
+  is made of. `.Inner` is therefore emitted as escaped text inside <pre>.
+*/ -}}
+<figure class="filetree">
+  <pre><code>{{ trim .Inner "\n\r" }}</code></pre>
+</figure>

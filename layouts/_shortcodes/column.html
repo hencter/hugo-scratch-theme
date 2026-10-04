@@ -1,0 +1,7 @@
+{{- /*
+  column — one column inside a {{% columns %}} row. Markdown notation.
+*/ -}}
+{{- if not .Parent -}}
+  {{- errorf "shortcode `column` must be nested inside `columns` (%s)" .Position -}}
+{{- end -}}
+<div class="columns__item">{{ .Inner }}</div>

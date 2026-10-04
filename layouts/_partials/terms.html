@@ -1,0 +1,20 @@
+{{- /*
+  terms.html — the taxonomy links for one page.
+
+  @context {dict} "page" (page) "taxonomy" (string, e.g. "tags")
+  @context {dict} "prefix" (string, optional, e.g. "#")
+
+  Taxonomies are configured in the SITE config, not the theme: the theme only
+  knows how to render whatever `page.GetTerms` returns, and returns nothing when
+  the taxonomy is not configured for that page.
+*/ -}}
+{{- $page := .page -}}
+{{- $taxonomy := .taxonomy -}}
+{{- $prefix := .prefix | default "" -}}
+{{- with $page.GetTerms $taxonomy -}}
+  <ul class="tag-list" aria-label="{{ T $taxonomy }}">
+    {{- range . }}
+      <li><a class="tag" href="{{ .RelPermalink }}">{{ $prefix }}{{ .LinkTitle }}</a></li>
+    {{- end -}}
+  </ul>
+{{- end -}}

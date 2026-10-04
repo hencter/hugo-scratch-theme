@@ -1,0 +1,42 @@
+{{- /*
+  render-image.html — every Markdown image goes through here.
+
+  Three things happen that Markdown alone cannot do:
+
+    · the source is resolved through the same helper as the figure shortcode and
+      the Open Graph tags, so a page-bundle image works in all three;
+    · intrinsic width/height are emitted when Hugo knows them, which is what
+      prevents the layout from jumping as images load;
+    · a destination that resolves NOWHERE is a build warning — a broken image is
+      a content bug, and `hugo --panicOnWarning` turns it into a failure.
+
+  A remote URL is exempt from the check: it cannot be verified offline.
+
+  A markdown title becomes a <figcaption>:
+      ![alt text](photo.jpg "Shot in 2026")
+*/ -}}
+{{- $destination := .Destination -}}
+{{- $remote := or (strings.HasPrefix $destination "http") (strings.HasPrefix $destination "//") (strings.HasPrefix $destination "data:") -}}
+{{- $image := partial "resolve-image.html" (dict "page" .Page "src" $destination) -}}
+{{- $alt := .Text | plainify -}}
+
+{{- if not $remote -}}
+  {{- $clean := strings.TrimPrefix "/" $destination -}}
+  {{- $inStatic := os.FileExists (path.Join "static" $clean) -}}
+  {{- if not (or $image.resource $inStatic) -}}
+    {{- warnf "render-image: %q was not found in the page bundle, assets/ or static/ (page %s)" $destination .Page.RelPermalink -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if .Title -}}
+  <figure class="figure">
+    <img class="figure__media" src="{{ $image.url }}" alt="{{ $alt }}"
+      {{- if gt $image.width 0 }} width="{{ $image.width }}" height="{{ $image.height }}"{{ end }}
+      loading="lazy" decoding="async">
+    <figcaption class="figure__caption">{{ .Title | markdownify }}</figcaption>
+  </figure>
+{{- else -}}
+  <img src="{{ $image.url }}" alt="{{ $alt }}"
+    {{- if gt $image.width 0 }} width="{{ $image.width }}" height="{{ $image.height }}"{{ end }}
+    loading="lazy" decoding="async">
+{{- end -}}

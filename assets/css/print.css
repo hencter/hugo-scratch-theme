@@ -1,0 +1,90 @@
+/* ==========================================================================
+   Print — what a reader gets from Ctrl+P
+   --------------------------------------------------------------------------
+   Navigation, search, theme controls and the back-to-top button are pure
+   chrome; printing them wastes paper and confuses the page numbers.
+   ========================================================================== */
+
+@media print {
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #000000;
+    --color-text-muted: #333333;
+    --color-text-faint: #555555;
+    --color-border: #999999;
+    --color-code-bg: #f5f5f5;
+    --color-header-bg: #ffffff;
+  }
+
+  html {
+    font-size: 11pt;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .site-header,
+  .site-footer,
+  .sidebar,
+  .toc,
+  .back-to-top,
+  .search-dialog,
+  .page-nav,
+  .pagination,
+  .skip-link,
+  .copy-button,
+  .nav-toggle,
+  .banner {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .layout,
+  .layout--with-sidebar,
+  .layout--with-sidebar.layout--with-toc,
+  .layout--with-toc:not(.layout--with-sidebar) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .page {
+    max-width: none;
+  }
+
+  a {
+    color: #000000;
+    text-decoration: underline;
+  }
+
+  /* Make link targets visible on paper, where a click is impossible. */
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  .heading-anchor {
+    display: none;
+  }
+
+  .highlight,
+  .callout,
+  .disclosure,
+  .figure,
+  .table-wrap {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+}

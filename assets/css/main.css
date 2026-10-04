@@ -1,0 +1,24 @@
+/* ==========================================================================
+   main.css — the single stylesheet entry point
+   --------------------------------------------------------------------------
+   This file is never shipped to the browser as-is. `layouts/_partials/head/css.html`
+   passes it through Hugo Pipes:
+
+       resources.Get "css/main.css" | css.Build | minify | fingerprint
+
+   `css.Build` inlines every @import below into ONE file and rewrites url()s,
+   so the browser makes exactly one CSS request. There is no PostCSS and no
+   Node.js in the pipeline — a plain `hugo` binary is enough.
+
+   Order matters: tokens define the custom properties everything else reads.
+   ========================================================================== */
+
+@import "tokens.css";
+@import "chroma-light.css";
+@import "chroma-dark.css";
+@import "base.css";
+@import "layout.css";
+@import "components.css";
+@import "content.css";
+@import "blocks.css";
+@import "print.css";

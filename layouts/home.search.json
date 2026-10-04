@@ -1,0 +1,40 @@
+{{- /*
+  home.search.json — the client-side search index.
+
+  Deliberately NOT emitted inside a <script> tag: Hugo writes this as a plain
+  application/json file, so there is no HTML escaping to reason about and the
+  browser can fetch it with a normal JSON parser.
+
+  `body` is a truncated plain-text projection of the page. Matching is substring
+  based (see assets/js/modules/search.js) because word-boundary matching does
+  not exist for Chinese, Japanese or Korean text.
+*/ -}}
+{{- $index := slice -}}
+
+{{- range site.Sections.ByWeight -}}
+  {{- $index = $index | append (dict
+        "title" .LinkTitle
+        "url" .RelPermalink
+        "section" .Section
+        "description" (.Description | default "")
+        "tags" slice
+        "date" ""
+        "body" "") -}}
+{{- end -}}
+
+{{- range site.RegularPages -}}
+  {{- $tags := slice -}}
+  {{- range .GetTerms "tags" }}{{ $tags = $tags | append .LinkTitle }}{{ end -}}
+  {{- $date := "" -}}
+  {{- if not .Date.IsZero }}{{ $date = .Date.Format "2006-01-02" }}{{ end -}}
+  {{- $index = $index | append (dict
+        "title" .Title
+        "url" .RelPermalink
+        "section" .Section
+        "description" (.Description | default (.Summary | plainify | truncate 160))
+        "tags" $tags
+        "date" $date
+        "body" (.Plain | truncate 2000)) -}}
+{{- end -}}
+
+{{- $index | jsonify -}}

@@ -1,0 +1,64 @@
+{{ define "main" }}
+  {{ partial "breadcrumbs.html" . }}
+
+  <header class="page__header">
+    <h1 class="page__title">{{ .Title }}</h1>
+    {{- with .Params.subtitle }}
+      <p class="page__lead">{{ . }}</p>
+    {{- else }}
+      {{- with .Description }}<p class="page__lead">{{ . }}</p>{{ end }}
+    {{- end }}
+  </header>
+
+  {{ partial "banner.html" . }}
+  {{ partial "page-meta.html" . }}
+  {{ partial "facts.html" . }}
+
+  {{- with .Content }}
+    <div class="prose">{{ . }}</div>
+  {{- end }}
+
+  {{- $tags := partial "terms.html" (dict "page" . "taxonomy" "tags" "prefix" "#") | strings.TrimSpace -}}
+  {{- $categories := partial "terms.html" (dict "page" . "taxonomy" "categories") | strings.TrimSpace -}}
+  {{- $series := partial "terms.html" (dict "page" . "taxonomy" "series") | strings.TrimSpace -}}
+  {{- if or $tags $categories $series }}
+    <footer class="page__taxonomies">
+      {{- with $categories }}
+        <div class="page__taxonomy">
+          <h2 class="page__taxonomy-title">{{ T "categories" }}</h2>
+          {{ . | safeHTML }}
+        </div>
+      {{- end }}
+      {{- with $series }}
+        <div class="page__taxonomy">
+          <h2 class="page__taxonomy-title">{{ T "series" }}</h2>
+          {{ . | safeHTML }}
+        </div>
+      {{- end }}
+      {{- with $tags }}
+        <div class="page__taxonomy">
+          <h2 class="page__taxonomy-title">{{ T "tags" }}</h2>
+          {{ . | safeHTML }}
+        </div>
+      {{- end }}
+    </footer>
+  {{- end }}
+
+  {{- /* Relative page collections: `.NextInSection` follows the section order. */ -}}
+  {{ partial "page-nav.html" . }}
+
+  {{- /* Alternative representations of THIS page. */ -}}
+  <p class="page__sources">
+    {{- with .OutputFormats.Get "md" }}
+      <a href="{{ .RelPermalink }}">{{ T "markdownSource" }}</a>
+    {{- end }}
+    {{- $edit := site.Params.editURL -}}
+    {{- with .File }}
+      {{- with $edit }}
+        · <a href="{{ printf "%s/%s" $edit .Path }}" rel="noopener">{{ T "editThisPage" }}</a>
+      {{- end }}
+    {{- end }}
+  </p>
+
+  {{ partial "comments.html" . }}
+{{ end }}

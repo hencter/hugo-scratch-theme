@@ -1,0 +1,84 @@
+{{- /*
+  head/meta.html — title, description, canonical, robots, authorship.
+
+  Three rules this partial exists to enforce:
+
+  1. The canonical URL is ABSOLUTE. `.Permalink` already is; a hand-written
+     relative path would be silently ignored by crawlers.
+  2. Paged archives canonicalise to the pager's own URL, not to page 1 —
+     otherwise pages 2..n claim to be duplicates of page 1.
+  3. Anything that is not a production build is `noindex, nofollow`, so a
+     preview deployment never ends up in a search index.
+
+  Note: plain `hugo` sets hugo.Environment to "production". Only `hugo server`
+  (and `hugo -e development`) produces the noindex head.
+*/ -}}
+
+{{- $page := . -}}
+{{- $sep := site.Params.titleSeparator | default "·" -}}
+{{- $seo := site.Params.seo | default dict -}}
+
+{{- /* --- Title ------------------------------------------------------- */ -}}
+{{- $title := "" -}}
+{{- if $page.IsHome -}}
+  {{- $title = site.Title -}}
+  {{- with site.Params.tagline }}{{ $title = printf "%s %s %s" site.Title $sep . }}{{ end -}}
+{{- else -}}
+  {{- $title = printf "%s %s %s" $page.Title $sep site.Title -}}
+{{- end -}}
+
+{{- if and $page.IsNode (ne $page.Kind "home") -}}
+  {{- with $page.Paginator -}}
+    {{- if gt .PageNumber 1 -}}
+      {{- $title = printf "%s %s %s" $title $sep (T "pageNumber" .) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* --- Description ------------------------------------------------- */ -}}
+{{- $description := $page.Description -}}
+{{- if not $description -}}
+  {{- if $page.IsPage -}}
+    {{- $description = $page.Summary -}}
+  {{- else -}}
+    {{- $description = site.Params.description -}}
+  {{- end -}}
+{{- end -}}
+{{- $description = $description | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace | truncate 160 -}}
+
+{{- /* --- Canonical --------------------------------------------------- */ -}}
+{{- $canonical := $page.Permalink -}}
+{{- if and $page.IsNode (ne $page.Kind "home") -}}
+  {{- with $page.Paginator -}}
+    {{- if gt .PageNumber 1 }}{{ $canonical = .URL | absURL }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- with $page.Params.canonical }}{{ $canonical = . | absURL }}{{ end -}}
+
+{{- /* --- Robots ------------------------------------------------------ */ -}}
+{{- $robots := "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" -}}
+{{- if not hugo.IsProduction }}{{ $robots = "noindex, nofollow" }}{{ end -}}
+{{- if $page.Params.noindex }}{{ $robots = "noindex, nofollow" }}{{ end -}}
+{{- with $page.Params.robots }}{{ $robots = . }}{{ end -}}
+
+<title>{{ $title }}</title>
+{{ with $description }}<meta name="description" content="{{ . }}">
+{{ end -}}
+<link rel="canonical" href="{{ $canonical }}">
+<meta name="robots" content="{{ $robots }}">
+<meta name="generator" content="Hugo {{ hugo.Version }}">
+
+{{- with $page.Params.keywords }}
+<meta name="keywords" content="{{ delimit . ", " }}">
+{{ end -}}
+{{- $author := "" -}}
+{{- with $page.Params.authors }}{{ $author = delimit . ", " }}{{ else }}{{ with site.Params.author }}{{ $author = . }}{{ end }}{{ end -}}
+{{- with $author }}
+<meta name="author" content="{{ . }}">
+{{ end -}}
+{{- with $page.Date }}{{ if not .IsZero }}
+<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05-07:00" }}">
+{{ end }}{{ end -}}
+{{- if not $page.Lastmod.IsZero }}
+<meta property="article:modified_time" content="{{ $page.Lastmod.Format "2006-01-02T15:04:05-07:00" }}">
+{{ end -}}

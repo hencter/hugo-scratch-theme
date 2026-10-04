@@ -1,0 +1,23 @@
+{{- /*
+  tab — one panel inside a {{% tabs %}} group.
+
+  MARKDOWN notation ({{% tab %}}): the inner content is rendered by the Markdown
+  renderer BEFORE this shortcode runs, so `.Inner` is already HTML and must NOT
+  be piped through `markdownify` again.
+
+  Note the sibling convention: the tabs group shares one store. This child
+  appends its title to the PARENT's store, and because nested shortcodes render
+  inside-out, the parent finds every title present by the time it renders.
+*/ -}}
+{{- $parent := .Parent -}}
+{{- if not $parent -}}
+  {{- errorf "shortcode `tab` must be nested inside `tabs` (%s)" .Position -}}
+{{- end -}}
+{{- $titles := $parent.Store.Get "tabTitles" | default slice -}}
+{{- $index := len $titles -}}
+{{- $id := printf "tabs-%v-%d" $parent.Ordinal $index -}}
+{{- $title := .Get "title" | default (.Get 0) | default (printf "Tab %d" (add $index 1)) -}}
+{{- $parent.Store.Set "tabTitles" ($titles | append (dict "id" $id "title" $title)) -}}
+<div class="tabs__panel" id="{{ $id }}-panel" role="tabpanel" aria-labelledby="{{ $id }}-tab" tabindex="0"{{ if gt $index 0 }} hidden{{ end }}>
+  {{ .Inner }}
+</div>

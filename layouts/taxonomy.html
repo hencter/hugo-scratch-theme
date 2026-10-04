@@ -1,0 +1,29 @@
+{{ define "main" }}
+  {{ partial "breadcrumbs.html" . }}
+
+  <header class="page__header">
+    <h1 class="page__title">{{ .Title }}</h1>
+    {{- with .Description }}<p class="page__lead">{{ . }}</p>{{ end }}
+  </header>
+
+  {{- with .Content }}
+    <div class="prose">{{ . }}</div>
+  {{- end }}
+
+  {{- /* On a taxonomy page, `.Paginator.Pages` are the TERM pages. */ -}}
+  {{- $paginator := .Paginator -}}
+  {{- if $paginator.Pages }}
+    <ul class="term-list">
+      {{- range $paginator.Pages }}
+        <li class="term-list__item">
+          <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+          <span class="term-list__count">{{ T "pageCount" (len .Pages) }}</span>
+        </li>
+      {{- end }}
+    </ul>
+  {{- else }}
+    <p class="page__empty">{{ T "noContent" }}</p>
+  {{- end }}
+
+  {{ partial "pagination.html" $paginator }}
+{{ end }}

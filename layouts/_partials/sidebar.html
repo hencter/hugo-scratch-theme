@@ -1,0 +1,51 @@
+{{- /*
+  sidebar.html — in-section navigation for documentation chapters.
+
+  Which sections get a sidebar is configuration, not code:
+      [params.nav]
+        sidebarSections = ['docs']
+
+  Only the ANCESTOR CHAIN of the current page is expanded. Expanding every
+  branch of a 20-section manual produces a wall of links that is harder to use
+  than no sidebar at all.
+
+  `.Pages` on a branch node contains BOTH regular pages and sub-sections, and
+  `.ByWeight` sorts them together — that is what keeps an interleaved
+  "chapter intro, page, page, subsection" order stable.
+*/ -}}
+
+{{- $flags := partial "layout/flags.html" . -}}
+{{- if $flags.sidebar -}}
+  {{- $root := site.GetPage (printf "/%s" .Section) -}}
+  {{- with $root -}}
+    <nav class="sidebar" aria-label="{{ T "sectionNavigation" }}">
+      <p class="sidebar__title">
+        <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+      </p>
+      {{- partial "inline/sidebar/tree.html" (dict "page" $ "node" .) -}}
+    </nav>
+  {{- end -}}
+{{- end -}}
+
+{{- define "_partials/inline/sidebar/tree.html" -}}
+  {{- $page := .page -}}
+  {{- $node := .node -}}
+  <ul class="sidebar__list">
+    {{- range $node.Pages.ByWeight -}}
+      {{- $entry := . -}}
+      {{- $current := eq $page.RelPermalink $entry.RelPermalink -}}
+      {{- $expanded := or $current ($page.IsDescendant $entry) -}}
+      <li class="sidebar__item">
+        <a class="sidebar__link" href="{{ $entry.RelPermalink }}"{{ if $current }} aria-current="page"{{ end }}>
+          <span>{{ $entry.LinkTitle }}</span>
+          {{- if $entry.IsSection -}}
+            <span class="sidebar__count" aria-hidden="true">{{ len $entry.RegularPagesRecursive }}</span>
+          {{- end -}}
+        </a>
+        {{- if and $entry.IsSection $expanded -}}
+          {{- partial "inline/sidebar/tree.html" (dict "page" $page "node" $entry) -}}
+        {{- end -}}
+      </li>
+    {{- end -}}
+  </ul>
+{{- end -}}

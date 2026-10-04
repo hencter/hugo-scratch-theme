@@ -1,0 +1,283 @@
+# ============================================================================
+#  i18n catalogue — English (en)
+# ----------------------------------------------------------------------------
+#  Rules that keep --printI18nWarnings silent:
+#    · Every key used by a template must exist in EVERY language file.
+#    · Keep the key order identical across languages so diffs stay readable.
+#    · Pluralised keys need "one" and "other" even in languages that only use
+#      "other" (zh-cn) — a missing plural bucket is a missing translation.
+#  Call from a template with: {{ T "key" }} or {{ T "key" . }} / {{ T "key" 3 }}
+# ============================================================================
+
+[skipToContent]
+other = "Skip to content"
+
+[menu]
+other = "Menu"
+
+[mainNavigation]
+other = "Main navigation"
+
+[toggleNavigation]
+other = "Toggle navigation"
+
+[breadcrumb]
+other = "Breadcrumb"
+
+[home]
+other = "Home"
+
+[close]
+other = "Close"
+
+# --- Search ---------------------------------------------------------------
+[search]
+other = "Search"
+
+[searchPlaceholder]
+other = "Search pages…"
+
+[searchHint]
+other = "Type to filter. Press Esc to close."
+
+[searchLoading]
+other = "Loading search index…"
+
+[searchNoResults]
+other = "No pages match your query."
+
+[searchResults]
+# Not pluralised on purpose: the count is substituted in JavaScript, and a Go
+# template action inside the string would be rendered (and lost) at build time.
+other = "%d pages found"
+
+# --- Theme ----------------------------------------------------------------
+[theme]
+other = "Colour theme"
+
+[themeLight]
+other = "Light"
+
+[themeDark]
+other = "Dark"
+
+[themeSystem]
+other = "System"
+
+# --- Language -------------------------------------------------------------
+[language]
+other = "Language"
+
+[switchLanguage]
+other = "Switch language"
+
+[contentLanguage]
+other = "Content language"
+
+# --- Navigation -----------------------------------------------------------
+[tableOfContents]
+other = "On this page"
+
+[onThisPage]
+other = "On this page"
+
+[sectionNavigation]
+other = "Section navigation"
+
+[inThisSection]
+other = "In this section"
+
+[pagination]
+other = "Pagination"
+
+[pageNumber]
+other = "Page {{ .PageNumber }}"
+
+[previous]
+other = "Previous"
+
+[next]
+other = "Next"
+
+[backToTop]
+other = "Back to top"
+
+[anchor]
+other = "Anchor link"
+
+[goHome]
+other = "Go to the home page"
+
+# --- Page metadata --------------------------------------------------------
+[published]
+other = "Published"
+
+[updated]
+other = "Updated"
+
+[author]
+other = "Author"
+
+[authors]
+other = "Authors"
+
+[readingTime]
+one = "{{ .Count }} minute read"
+other = "{{ .Count }} minute read"
+
+[wordCount]
+one = "{{ .Count }} word"
+other = "{{ .Count }} words"
+
+[pageMetadata]
+other = "Page metadata"
+
+[licenseLabel]
+other = "License"
+
+[difficulty]
+other = "Difficulty"
+
+[estimatedTime]
+other = "Estimated time"
+
+[prerequisites]
+other = "Prerequisites"
+
+[outcomes]
+other = "What you will learn"
+
+# --- Taxonomies -----------------------------------------------------------
+[tags]
+other = "Tags"
+
+[categories]
+other = "Categories"
+
+[series]
+other = "Series"
+
+[terms]
+other = "Terms"
+
+[pageCount]
+one = "{{ .Count }} page"
+other = "{{ .Count }} pages"
+
+[relatedPages]
+other = "Related pages"
+
+# --- Lists ----------------------------------------------------------------
+[latestPosts]
+other = "Latest posts"
+
+[allPosts]
+other = "All posts"
+
+[readMore]
+other = "Read more"
+
+[noContent]
+other = "Nothing here yet."
+
+[featured]
+other = "Featured"
+
+# --- Actions --------------------------------------------------------------
+[copy]
+other = "Copy"
+
+[copied]
+other = "Copied"
+
+[copyCode]
+other = "Copy code to clipboard"
+
+[expand]
+other = "Expand"
+
+[collapse]
+other = "Collapse"
+
+[editThisPage]
+other = "Edit this page"
+
+[viewSource]
+other = "View source"
+
+[markdownSource]
+other = "Markdown source"
+
+[machineReadable]
+other = "Machine-readable output"
+
+[externalLink]
+other = "External link"
+
+[opensInNewTab]
+other = "opens in a new tab"
+
+[rss]
+other = "RSS feed"
+
+[sitemap]
+other = "Sitemap"
+
+[agents]
+other = "For AI agents"
+
+[discussion]
+other = "Discussion"
+
+[startDiscussion]
+other = "Start a discussion about this page"
+
+# --- Shortcodes -----------------------------------------------------------
+[note]
+other = "Note"
+
+[tip]
+other = "Tip"
+
+[warning]
+other = "Warning"
+
+[danger]
+other = "Danger"
+
+[example]
+other = "Example"
+
+[details]
+other = "Details"
+
+[steps]
+other = "Steps"
+
+[tabs]
+other = "Tabs"
+
+[videoUnsupported]
+other = "Your browser does not support embedded video."
+
+# --- Status ---------------------------------------------------------------
+[draftBanner]
+other = "This page is a draft: it is excluded from production builds."
+
+[futureBanner]
+other = "This page is dated in the future and is hidden unless built with --buildFuture."
+
+[expiredBanner]
+other = "This page is past its expiry date and is hidden unless built with --buildExpired."
+
+[poweredBy]
+other = "Built with Hugo"
+
+[notFoundTitle]
+other = "Page not found"
+
+[notFoundMessage]
+other = "The page you requested does not exist. It may have been moved or renamed."
+
+[notFoundHint]
+other = "Try the search box, or start again from the home page."

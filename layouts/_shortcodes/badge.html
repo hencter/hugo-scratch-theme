@@ -1,0 +1,11 @@
+{{- /*
+  badge — an inline label.
+
+      {{< badge "New" >}}          {{< badge "Beta" tone="accent" >}}
+
+  Self-closing (no .Inner): a shortcode that takes its whole content from
+  arguments cannot be mistakenly written in the wrong notation.
+*/ -}}
+{{- $text := .Get "text" | default (.Get 0) -}}
+{{- $tone := .Get "tone" -}}
+<span class="badge{{ with $tone }} badge--{{ . }}{{ end }}">{{ $text }}</span>

@@ -1,0 +1,63 @@
+{{ define "main" }}
+  {{- $home := site.Params.home | default dict -}}
+  {{- $latestCount := index $home "latestCount" | default 5 -}}
+
+  {{- with .Content }}
+    <div class="prose home__intro">{{ . }}</div>
+  {{- end }}
+
+  {{- /* --- Sections, straight from the content tree ------------------- */ -}}
+  {{- $sections := .Sections.ByWeight -}}
+  {{- if $sections }}
+    <section class="home__block" aria-labelledby="home-sections">
+      <h2 id="home-sections" class="home__heading">{{ T "sectionNavigation" }}</h2>
+      <ul class="card-grid">
+        {{- range $sections -}}
+          {{- if not .Params.hidden }}{{ partial "card.html" (dict "page" .) }}{{ end -}}
+        {{- end -}}
+      </ul>
+    </section>
+  {{- end }}
+
+  {{- /* --- Latest posts from the blog section -------------------------- */ -}}
+  {{- with site.GetPage "/blog" -}}
+    {{- $latest := .RegularPages.ByDate.Reverse | first $latestCount -}}
+    {{- if $latest }}
+      <section class="home__block" aria-labelledby="home-latest">
+        <h2 id="home-latest" class="home__heading">{{ T "latestPosts" }}</h2>
+        {{ partial "page-list.html" (dict "pages" $latest) }}
+        <p><a href="{{ .RelPermalink }}">{{ T "allPosts" }} →</a></p>
+      </section>
+    {{- end }}
+  {{- end }}
+
+  {{- /* --- Tag cloud ---------------------------------------------------- */ -}}
+  {{- with index site.Taxonomies "tags" }}
+    <section class="home__block" aria-labelledby="home-tags">
+      <h2 id="home-tags" class="home__heading">{{ T "tags" }}</h2>
+      <ul class="tag-list">
+        {{- range .ByCount }}
+          <li>
+            <a class="tag" href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} <span class="sidebar__count">{{ .Count }}</span></a>
+          </li>
+        {{- end }}
+      </ul>
+    </section>
+  {{- end }}
+
+  {{- /* --- Agent entry points ------------------------------------------- */ -}}
+  <section class="home__block" aria-labelledby="home-agents">
+    <h2 id="home-agents" class="home__heading">{{ T "agents" }}</h2>
+    <p>{{ T "machineReadable" }}</p>
+    <ul class="card-grid">
+      {{- range (slice "llms" "pagesjson" "md" "search") -}}
+        {{- with site.Home.OutputFormats.Get . -}}
+          <li class="card">
+            <h3 class="card__title"><a href="{{ .RelPermalink }}">{{ .BaseName }}.{{ .MediaType.Suffixes }}</a></h3>
+            <p class="card__summary">{{ .MediaType.Type }}</p>
+          </li>
+        {{- end -}}
+      {{- end }}
+    </ul>
+  </section>
+{{ end }}

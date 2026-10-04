@@ -1,0 +1,44 @@
+{{- /*
+  sitemap.xml — replaces the embedded template.
+
+  Two reasons to override it:
+    · every language's sitemap cross-links its translations with xhtml:link,
+      which is what tells a search engine the pages are alternatives rather
+      than duplicates;
+    · `.Sitemap.ChangeFreq` / `.Sitemap.Priority` are read per page, so the
+      front matter of a single page can override the site-wide defaults.
+
+  The page collection is resolved defensively and then ASSERTED: a silently
+  empty sitemap is far worse than a failed build, and the two candidate accessors
+  differ across Hugo versions.
+*/ -}}
+{{- $pages := .Pages -}}
+{{- if not $pages -}}
+  {{- $data := .Data | default dict -}}
+  {{- $pages = index $data "Pages" -}}
+{{- end -}}
+{{- if not $pages -}}
+  {{- errorf "sitemap.xml: no page collection on the template context (hugo %s) — check .Pages vs .Data.Pages for this version" hugo.Version -}}
+{{- end -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  {{- range $pages }}
+  <url>
+    <loc>{{ .Permalink }}</loc>
+    {{- if not .Lastmod.IsZero }}
+    <lastmod>{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}</lastmod>
+    {{- end }}
+    {{- with .Sitemap.ChangeFreq }}
+    <changefreq>{{ . }}</changefreq>
+    {{- end }}
+    {{- if ge .Sitemap.Priority 0.0 }}
+    <priority>{{ .Sitemap.Priority }}</priority>
+    {{- end }}
+    {{- if gt (len .AllTranslations) 1 }}
+    {{- range .AllTranslations }}
+    <xhtml:link rel="alternate" hreflang="{{ .Language.Locale }}" href="{{ .Permalink }}"/>
+    {{- end }}
+    {{- end }}
+  </url>
+  {{- end }}
+</urlset>

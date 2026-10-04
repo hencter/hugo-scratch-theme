@@ -1,0 +1,51 @@
+{{- /*
+  head/js.html — JavaScript pipeline.
+
+  js.Build runs esbuild inside Hugo: it bundles the ES module graph, transpiles
+  to the target, and injects the `@params` virtual module — which is how the
+  search-index URL and the translated UI strings reach the browser without a
+  second request or one data attribute per string.
+
+  In development the bundle keeps a linked source map, so the browser console
+  points at the original module. In production it is minified and hashed, and an
+  SRI hash is emitted so the file cannot be swapped underneath the page.
+*/ -}}
+
+{{- $dev := hugo.IsDevelopment -}}
+
+{{- /* URL of the JSON search index produced by the `search` output format on
+       the home page. `with` keeps this safe on a site that removed the format
+       from [outputs]. */ -}}
+{{- $searchIndex := "" -}}
+{{- with site.Home.OutputFormats.Get "search" }}{{ $searchIndex = .RelPermalink }}{{ end -}}
+
+{{- $params := dict
+      "searchIndex" $searchIndex
+      "i18n" (dict
+        "copy"            (T "copy")
+        "copied"          (T "copied")
+        "searchLoading"   (T "searchLoading")
+        "searchNoResults" (T "searchNoResults")
+        "searchResults"   (T "searchResults")
+        "searchHint"      (T "searchHint")) -}}
+
+{{- $opts := dict
+      "minify"    (not $dev)
+      "target"    "es2020"
+      "format"    "iife"
+      "sourceMap" (cond $dev "linked" "none")
+      "params"    $params -}}
+
+{{- with resources.Get "js/main.js" -}}
+  {{- with . | js.Build $opts -}}
+    {{- if $dev -}}
+      <script src="{{ .RelPermalink }}" defer></script>
+    {{- else -}}
+      {{- with . | fingerprint "sha384" -}}
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous" defer></script>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- errorf "theme asset assets/js/main.js is missing — cannot build the bundle" -}}
+{{- end -}}

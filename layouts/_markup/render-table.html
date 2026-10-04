@@ -1,0 +1,48 @@
+{{- /*
+  render-table.html — every Markdown table goes through here.
+
+  The whole point of this override is `.table-wrap`: a wide table on a narrow
+  screen must scroll horizontally instead of widening the page (and therefore
+  every other element). The table itself is reproduced cell by cell, which also
+  lets column alignment travel as CSS rather than as a style attribute in the
+  middle of the markup.
+
+  Block attributes from `{...#id .class}` land on the <table> element.
+*/ -}}
+<div class="table-wrap">
+  <table{{ range $k, $v := .Attributes }} {{ $k }}="{{ $v }}"{{ end }}>
+    {{- with .THead }}
+      <thead>
+        {{- range . }}
+          <tr>
+            {{- range . }}
+              <th{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text | safeHTML }}</th>
+            {{- end }}
+          </tr>
+        {{- end }}
+      </thead>
+    {{- end }}
+    {{- with .TBody }}
+      <tbody>
+        {{- range . }}
+          <tr>
+            {{- range . }}
+              <td{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text | safeHTML }}</td>
+            {{- end }}
+          </tr>
+        {{- end }}
+      </tbody>
+    {{- end }}
+    {{- with .TFoot }}
+      <tfoot>
+        {{- range . }}
+          <tr>
+            {{- range . }}
+              <td{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text | safeHTML }}</td>
+            {{- end }}
+          </tr>
+        {{- end }}
+      </tfoot>
+    {{- end }}
+  </table>
+</div>

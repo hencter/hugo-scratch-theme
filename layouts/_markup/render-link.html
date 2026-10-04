@@ -1,0 +1,32 @@
+{{- /*
+  render-link.html — every Markdown link goes through here.
+
+    · an absolute http(s) destination is marked as external and gets
+      rel="noopener", so a target cannot reach back through window.opener;
+    · a site-relative destination that resolves to no page is a build warning,
+      which is how a renamed page stops silently breaking every inbound link;
+    · `mailto:` and bare anchors are left alone.
+
+  The internal check is switchable, because a site may legitimately link to a
+  path that only exists after deployment:
+
+      [params]
+        validateInternalLinks = false
+*/ -}}
+{{- $destination := .Destination -}}
+{{- $external := or (strings.HasPrefix $destination "http") (strings.HasPrefix $destination "//") -}}
+{{- $validate := site.Params.validateInternalLinks -}}
+{{- if eq $validate nil }}{{ $validate = true }}{{ end -}}
+
+{{- if and $validate (not $external) (strings.HasPrefix $destination "/") -}}
+  {{- $looksLikePage := not (strings.Contains $destination ".") -}}
+  {{- if $looksLikePage -}}
+    {{- if not ($.Page.GetPage $destination) -}}
+      {{- warnf "render-link: %q does not resolve to a page (page %s)" $destination $.Page.RelPermalink -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<a href="{{ $destination | safeURL }}"
+  {{- if $external }} class="external-link" rel="noopener"{{ end }}
+  {{- with .Title }} title="{{ . }}"{{ end }}>{{ .Text | safeHTML }}</a>

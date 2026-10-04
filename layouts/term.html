@@ -1,0 +1,21 @@
+{{ define "main" }}
+  {{ partial "breadcrumbs.html" . }}
+
+  <header class="page__header">
+    <h1 class="page__title">{{ .Title }}</h1>
+    {{- with .Description }}<p class="page__lead">{{ . }}</p>{{ end }}
+  </header>
+
+  {{- with .Content }}
+    <div class="prose">{{ . }}</div>
+  {{- end }}
+
+  {{- $paginator := .Paginator -}}
+  {{- if $paginator.Pages }}
+    {{ partial "page-list.html" (dict "pages" $paginator.Pages) }}
+  {{- else }}
+    <p class="page__empty">{{ T "noContent" }}</p>
+  {{- end }}
+
+  {{ partial "pagination.html" $paginator }}
+{{ end }}

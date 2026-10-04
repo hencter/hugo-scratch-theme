@@ -1,0 +1,50 @@
+{{- /*
+  facts.html — the machine-readable facts panel for a documentation page.
+
+  Difficulty, time, prerequisites and outcomes live in the front matter, not in
+  prose, so that both a reader skimming the page and an agent reading
+  pages.json get the same answer to "should I read this, and what will it cost
+  me". The panel is only rendered when at least one field is present.
+*/ -}}
+{{- $page := . -}}
+{{- $difficulty := $page.Params.difficulty -}}
+{{- $time := $page.Params.estimatedTime -}}
+{{- $prerequisites := $page.Params.prerequisites -}}
+{{- $outcomes := $page.Params.outcomes -}}
+{{- if or $difficulty $time $prerequisites $outcomes -}}
+  <aside class="facts" aria-label="{{ T "pageMetadata" }}">
+    {{- with $difficulty }}
+      <div class="facts__item">
+        <p class="facts__term">{{ T "difficulty" }}</p>
+        <p class="facts__value">{{ . }}</p>
+      </div>
+    {{- end }}
+    {{- with $time }}
+      <div class="facts__item">
+        <p class="facts__term">{{ T "estimatedTime" }}</p>
+        <p class="facts__value">{{ . }} min</p>
+      </div>
+    {{- end }}
+    {{- with $prerequisites }}
+      <div class="facts__item">
+        <p class="facts__term">{{ T "prerequisites" }}</p>
+        <ul class="facts__value">
+          {{- range . }}
+            {{- $href := . -}}
+            {{- $label := . -}}
+            {{- with site.GetPage . }}{{ $href = .RelPermalink }}{{ $label = .LinkTitle }}{{ end }}
+            <li><a href="{{ $href }}">{{ $label }}</a></li>
+          {{- end }}
+        </ul>
+      </div>
+    {{- end }}
+    {{- with $outcomes }}
+      <div class="facts__item">
+        <p class="facts__term">{{ T "outcomes" }}</p>
+        <ul class="facts__value">
+          {{- range . }}<li>{{ . }}</li>{{ end }}
+        </ul>
+      </div>
+    {{- end }}
+  </aside>
+{{- end -}}

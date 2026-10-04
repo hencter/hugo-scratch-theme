@@ -1,0 +1,61 @@
+{{- /*
+  home.llms.txt — the AI entry point proposed by the llms.txt convention.
+
+  One file, plain text, no HTML: a reader (human or model) learns what the site
+  is, what its sections mean, and where the machine-readable surfaces are,
+  without fetching a single page first.
+
+  Rendered with text/template (the `llms` output format sets isPlainText), so
+  nothing below is escaped. Every section lookup is wrapped in `with`, because a
+  site that renamed or removed a section must degrade to a shorter file, not to
+  a build error.
+*/ -}}
+# {{ site.Title }}
+
+> {{ site.Params.description }}
+{{ with site.Params.tagline }}
+> {{ . }}
+{{ end }}
+{{ with site.Home.RawContent }}
+{{ . }}
+{{ end }}
+## Sections
+
+{{ range site.Sections.ByWeight -}}
+- [{{ .LinkTitle }}]({{ .Permalink }}){{ with .Description }}: {{ . }}{{ end }}
+{{ end }}
+{{ with site.GetPage "/docs" -}}
+## Documentation index
+
+{{ range .Sections.ByWeight -}}
+- [{{ .LinkTitle }}]({{ .Permalink }}){{ with .Description }}: {{ . }}{{ end }}
+  {{- range .Pages.ByWeight }}
+  - [{{ .LinkTitle }}]({{ .Permalink }})
+  {{- end }}
+{{ end }}
+{{ end -}}
+{{ with site.GetPage "/blog" -}}
+## Latest posts
+
+{{ range first 10 .RegularPages.ByDate.Reverse -}}
+- [{{ .Title }}]({{ .Permalink }}){{ with .Description }}: {{ . }}{{ end }}
+{{ end }}
+{{ end -}}
+## Machine-readable
+
+- [pages.json]({{ with site.Home.OutputFormats.Get "pagesjson" }}{{ .Permalink }}{{ end }}): every page with its role, dates and difficulty, for planning a reading order.
+- [search.json]({{ with site.Home.OutputFormats.Get "search" }}{{ .Permalink }}{{ end }}): title, description, tags and a body excerpt per page.
+- [sitemap.xml]({{ "sitemap.xml" | absURL }}): canonical URLs.
+- [index.xml]({{ with site.Home.OutputFormats.Get "rss" }}{{ .Permalink }}{{ end }}): the feed.
+
+## Optional
+
+Every HTML page has a Markdown twin: append `index.md` to its URL (for example
+{{ .Permalink }}index.md). The twin opens with normalised YAML front matter, so a
+page can be read without parsing HTML.
+
+## All pages
+
+{{ range site.RegularPages.ByTitle -}}
+- [{{ .Title }}]({{ .Permalink }})
+{{ end }}

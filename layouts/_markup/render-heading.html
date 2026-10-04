@@ -1,0 +1,19 @@
+{{- /*
+  render-heading.html — every Markdown heading goes through here.
+
+  Jobs:
+    · keep the id Hugo computed (`.Anchor`) but let an explicit `{#id}` win;
+    · pass through `{.class}` and other block attributes;
+    · append a visible-on-hover anchor link, which is what makes a heading
+      quotable in a chat or an issue.
+
+  The anchor text is a real link with an accessible name, not a decorative
+  glyph: a screen-reader user needs to be able to reach it.
+*/ -}}
+{{- $level := .Level -}}
+{{- $id := .Anchor -}}
+{{- with index .Attributes "id" }}{{ $id = . }}{{ end -}}
+<h{{ $level }} id="{{ $id }}"{{ range $k, $v := .Attributes }}{{ if ne $k "id" }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
+  {{- .Text | safeHTML -}}
+  <a class="heading-anchor" href="#{{ $id }}" aria-label="{{ T "anchor" }}">#</a>
+</h{{ $level }}>

@@ -1,0 +1,28 @@
+{{- /*
+  card.html — one card in a card grid.
+
+  @context {dict} "page" (page)
+
+  The card is a <li>: the grid that contains it is a <ul>. A whole-card click
+  target is created by stretching the title link with a pseudo-element in CSS
+  rather than by wrapping everything in an <a>, which would produce a link
+  containing a heading — awkward for screen readers and invalid in some
+  contexts.
+*/ -}}
+{{- $page := .page -}}
+{{- $fmt := site.Params.dateFormat | default ":date_long" -}}
+<li class="card">
+  <h3 class="card__title">
+    <a href="{{ $page.RelPermalink }}">{{ $page.LinkTitle }}</a>
+  </h3>
+  <p class="card__summary">
+    {{- with $page.Description }}{{ . }}{{ else }}{{ $page.Summary | plainify | truncate 140 }}{{ end -}}
+  </p>
+  {{- if and $page.IsPage (not $page.Date.IsZero) }}
+    <p class="card__meta">
+      <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date | time.Format $fmt }}</time>
+    </p>
+  {{- else if $page.IsSection }}
+    <p class="card__meta">{{ T "pageCount" (len $page.RegularPagesRecursive) }}</p>
+  {{- end }}
+</li>

@@ -1,0 +1,29 @@
+{{- /*
+  analytics.html — opt-in, production-only analytics.
+
+  Nothing is emitted until a site sets a value:
+
+      [params.analytics]
+        googleAnalytics = "G-XXXXXXX"
+        plausibleDomain = "example.com"
+
+  Both scripts are also suppressed outside production, so `hugo server` never
+  pollutes the statistics with your own reloads.
+*/ -}}
+{{- $analytics := site.Params.analytics | default dict -}}
+{{- $google := index $analytics "googleAnalytics" -}}
+{{- $plausible := index $analytics "plausibleDomain" -}}
+{{- if hugo.IsProduction -}}
+  {{- with $google }}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ . }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', '{{ . }}');
+    </script>
+  {{- end }}
+  {{- with $plausible }}
+    <script defer data-domain="{{ . }}" src="https://plausible.io/js/script.js"></script>
+  {{- end }}
+{{- end -}}

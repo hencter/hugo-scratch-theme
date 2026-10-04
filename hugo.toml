@@ -1,0 +1,106 @@
+# ============================================================================
+#  Theme configuration — hugo-scratch-theme
+# ----------------------------------------------------------------------------
+#  A theme configuration may set ONLY these keys:
+#    · params
+#    · menu
+#    · outputformats
+#    · mediacontenttypes  (mediaTypes)
+#  Every other key in this file is ignored by Hugo when the file is the theme's
+#  configuration. That is why the site — not the theme — declares [outputs],
+#  baseURL, languages, taxonomies and markup settings.
+#  Reference: https://gohugo.io/hugo-modules/theme-components/#configuration
+# ============================================================================
+
+[module]
+  [module.hugoVersion]
+    # The theme needs no SCSS/PostCSS, so the standard (non-extended) binary is enough.
+    extended = false
+    min = '0.146.0'
+
+# ---------------------------------------------------------------------------
+#  Custom media types + output formats shipped by the theme.
+#  A site just lists the format names in [outputs] to switch them on.
+# ---------------------------------------------------------------------------
+[mediatypes.'text/markdown']
+  suffixes = ['md']
+
+[outputformats.md]
+  mediaType      = 'text/markdown'
+  baseName       = 'index'
+  isPlainText    = true
+  isHTML         = false
+
+[outputformats.llms]
+  mediaType      = 'text/plain'
+  baseName       = 'llms'
+  isPlainText    = true
+  isHTML         = false
+  notAlternative = true
+
+[outputformats.search]
+  mediaType      = 'application/json'
+  baseName       = 'search'
+  isPlainText    = true
+  isHTML         = false
+  notAlternative = true
+
+[outputformats.pagesjson]
+  mediaType      = 'application/json'
+  baseName       = 'pages'
+  isPlainText    = true
+  isHTML         = false
+  notAlternative = true
+
+# ---------------------------------------------------------------------------
+#  Default params. A site's own [params] entries win — this is only the floor,
+#  so a site can adopt the theme and build before configuring anything.
+# ---------------------------------------------------------------------------
+[params]
+  description = 'A scratch Hugo site demonstrating the full feature set.'
+  tagline     = ''
+  author      = ''
+  titleSeparator = '·'
+  dateFormat  = ':date_long'
+  # Fallback social image, relative to the assets/ or static/ tree.
+  images = ['images/og-default.png']
+  ogImageWidth  = 1200
+  ogImageHeight = 630
+  twitterHandle = ''
+
+  [params.ui]
+    stickyHeader        = true
+    showBreadcrumbs     = true
+    showTableOfContents = true
+    tocMinHeadings      = 3
+    showSidebar         = true
+    showReadingTime     = true
+    showWordCount       = false
+    showDate            = true
+    showPrevNext        = true
+    showRelated         = true
+    showTags            = true
+    showSearch          = true
+    showThemeToggle     = true
+    showLanguageSwitcher = true
+    showEditLink        = true
+    showBackToTop       = true
+
+  [params.nav]
+    # Which top-level sections get the documentation sidebar.
+    sidebarSections = ['docs']
+
+  [params.seo]
+    # Organization name used by JSON-LD (falls back to site.Title).
+    organization  = ''
+    logo          = 'images/logo.svg'
+
+  [params.analytics]
+    # Left empty on purpose: nothing is emitted unless a site opts in.
+    googleAnalytics = ''
+    plausibleDomain = ''
+
+  [params.comments]
+    # The theme renders a placeholder container that a site can replace with
+    # its own partial. No third-party script is loaded by default.
+    provider = ''

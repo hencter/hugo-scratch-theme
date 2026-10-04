@@ -1,0 +1,21 @@
+{{- /*
+  scripts.html — late-page markup that the bundle needs to find.
+
+  These are elements, not inline scripts: everything dynamic is in the single
+  bundled file, so the Content Security Policy does not have to allow inline
+  script for the site to work.
+*/ -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $show := index $ui "showBackToTop" -}}
+{{- if eq $show nil }}{{ $show = true }}{{ end -}}
+{{- if $show -}}
+  <button
+    class="back-to-top"
+    type="button"
+    data-back-to-top
+    data-visible="false"
+    aria-label="{{ T "backToTop" }}"
+    title="{{ T "backToTop" }}">
+    {{ partial "icon.html" "arrow-up" }}
+  </button>
+{{- end -}}

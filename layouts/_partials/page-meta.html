@@ -1,0 +1,61 @@
+{{- /*
+  page-meta.html — the line under a page title: dates, author, reading time.
+
+  Two rules that are easy to get wrong:
+
+    · `.Date` is a time.Time STRUCT, so `{{ with .Date }}` is always true and an
+      undated page would happily print "0001-01-01". Every date here is guarded
+      with `.IsZero`.
+    · Machine-readable dates use <time datetime="…"> with ISO 8601, whatever the
+      visible text looks like. The visible text comes from params.dateFormat,
+      which each language overrides — the localized `:date_long` token falls back
+      to English for locales the data does not cover.
+*/ -}}
+
+{{- $page := . -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $fmt := site.Params.dateFormat | default ":date_long" -}}
+
+{{- $showDate := index $ui "showDate" -}}{{- if eq $showDate nil }}{{ $showDate = true }}{{ end -}}
+{{- $showReading := index $ui "showReadingTime" -}}{{- if eq $showReading nil }}{{ $showReading = true }}{{ end -}}
+{{- $showWords := index $ui "showWordCount" -}}{{- if eq $showWords nil }}{{ $showWords = false }}{{ end -}}
+
+{{- $hasUpdated := false -}}
+{{- if not $page.Lastmod.IsZero -}}
+  {{- if ne ($page.Lastmod.Format "2006-01-02") ($page.Date.Format "2006-01-02") }}{{ $hasUpdated = true }}{{ end -}}
+{{- end -}}
+
+{{- if or (and $showDate (not $page.Date.IsZero)) $hasUpdated $page.Params.authors (and $showReading $page.IsPage) -}}
+  <ul class="meta">
+    {{- if and $showDate (not $page.Date.IsZero) }}
+      <li class="meta__item">
+        <span class="meta__label">{{ T "published" }}</span>
+        <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date | time.Format $fmt }}</time>
+      </li>
+    {{- end -}}
+    {{- if and $showDate $hasUpdated }}
+      <li class="meta__item">
+        <span class="meta__label">{{ T "updated" }}</span>
+        <time datetime="{{ $page.Lastmod.Format "2006-01-02" }}">{{ $page.Lastmod | time.Format $fmt }}</time>
+      </li>
+    {{- end -}}
+    {{- with $page.Params.authors }}
+      <li class="meta__item">
+        <span class="meta__label">{{ T "author" }}</span>
+        <span>{{ delimit . ", " }}</span>
+      </li>
+    {{- end -}}
+    {{- if and $showReading $page.IsPage }}
+      <li class="meta__item">{{ T "readingTime" $page.ReadingTime }}</li>
+    {{- end -}}
+    {{- if and $showWords $page.IsPage }}
+      <li class="meta__item">{{ T "wordCount" $page.WordCount }}</li>
+    {{- end -}}
+    {{- with $page.Params.license }}
+      <li class="meta__item">
+        <span class="meta__label">{{ T "licenseLabel" }}</span>
+        <span>{{ . }}</span>
+      </li>
+    {{- end -}}
+  </ul>
+{{- end -}}

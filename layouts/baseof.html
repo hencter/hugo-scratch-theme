@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{{- /*
+  baseof.html — the document contract.
+
+  Every page-kind template (home.html, page.html, section.html, taxonomy.html,
+  term.html) defines only the "main" block; this file owns <html>, the
+  landmarks and the three-column grid.
+
+  `layout/flags.html` returns the two booleans the grid needs, so the decision
+  "does this page get a sidebar / a table of contents" lives in exactly one
+  place instead of being repeated in every template.
+*/ -}}
+{{- $flags := partial "layout/flags.html" . -}}
+<html lang="{{ site.Language.Locale }}" dir="{{ or site.Language.Direction `ltr` }}" data-theme="light" class="light">
+  {{ partial "head.html" . }}
+  <body class="kind-{{ .Kind }}{{ with .Type }} type-{{ . }}{{ end }}">
+    <a class="skip-link" href="#main">{{ T "skipToContent" }}</a>
+
+    {{ partial "header.html" . }}
+
+    <div class="container">
+      <div class="layout{{ if $flags.sidebar }} layout--with-sidebar{{ end }}{{ if $flags.toc }} layout--with-toc{{ end }}{{ if not (or $flags.sidebar $flags.toc) }} layout--solo{{ end }}">
+        {{ partial "sidebar.html" . }}
+
+        <main id="main" class="page {{ if .IsPage }}page--reading{{ else }}page--wide{{ end }}" tabindex="-1">
+          {{ block "main" . }}{{ end }}
+        </main>
+
+        {{ partial "toc.html" . }}
+      </div>
+    </div>
+
+    {{ partial "footer.html" . }}
+    {{ partial "scripts.html" . }}
+    {{ block "scripts" . }}{{ end }}
+  </body>
+</html>

@@ -1,0 +1,27 @@
+{{- /*
+  shortcodes/callout.html — the engine behind {{< note >}}, {{< tip >}},
+  {{< warning >}} and {{< danger >}}.
+
+  @context {dict} "type" (string) "title" (string, optional) "content" (template.HTML)
+
+  The label falls back to an i18n entry only for the known types; an arbitrary
+  type is humanised instead, because passing an unknown key to `T` would emit a
+  MISSING_TRANSLATION warning on every page that used it.
+*/ -}}
+{{- $type := .type | default "note" -}}
+{{- $label := .title -}}
+{{- if not $label -}}
+  {{- if in (slice "note" "tip" "warning" "danger" "example") $type -}}
+    {{- $label = T $type -}}
+  {{- else -}}
+    {{- $label = $type | humanize -}}
+  {{- end -}}
+{{- end -}}
+{{- $icons := dict "note" "info" "tip" "lightbulb" "warning" "alert" "danger" "shield" "example" "book" -}}
+<div class="callout callout--{{ $type }}">
+  <p class="callout__title">
+    {{- partial "icon.html" (index $icons $type | default "info") -}}
+    <span>{{ $label }}</span>
+  </p>
+  <div class="callout__body">{{ .content }}</div>
+</div>

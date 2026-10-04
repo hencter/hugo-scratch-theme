@@ -1,0 +1,47 @@
+{{- /*
+  resolve-image.html — one place that turns an image reference into a URL plus
+  intrinsic dimensions.
+
+  An image can live in three different places, and Hugo only finds it in the
+  right one if you ask the right question first:
+
+    1. a page resource   (leaf bundle: content/blog/post/index.md + photo.jpg)
+    2. an asset          (assets/images/photo.jpg — processable, but only
+                          published when something references it)
+    3. static            (static/images/photo.jpg — copied verbatim)
+
+  @context {dict} "page" (page, optional) "src" (string)
+  @returns {dict} {url, width, height, resource}
+*/ -}}
+
+{{- $page := .page -}}
+{{- $src := .src -}}
+{{- $result := dict "url" "" "width" 0 "height" 0 "resource" false -}}
+
+{{- if $src -}}
+  {{- /* Strip a leading slash so bundle/asset lookups can match. */ -}}
+  {{- $clean := strings.TrimPrefix "/" $src -}}
+  {{- $res := false -}}
+
+  {{- if $page -}}
+    {{- with $page.Resources.GetMatch $clean }}{{ $res = . }}{{ end -}}
+  {{- end -}}
+  {{- if not $res -}}
+    {{- with resources.Get $clean }}{{ $res = . }}{{ end -}}
+  {{- end -}}
+
+  {{- if $res -}}
+    {{- /* Only raster images expose Width/Height; an SVG does not. */ -}}
+    {{- $raster := slice "png" "jpg" "jpeg" "gif" "webp" "tiff" "bmp" -}}
+    {{- if in $raster $res.MediaType.SubType -}}
+      {{- $result = dict "url" $res.Permalink "width" $res.Width "height" $res.Height "resource" $res -}}
+    {{- else -}}
+      {{- $result = dict "url" $res.Permalink "width" 0 "height" 0 "resource" $res -}}
+    {{- end -}}
+  {{- else -}}
+    {{- /* Assume static/: it is copied verbatim, so absURL is the whole job. */ -}}
+    {{- $result = dict "url" ($src | absURL) "width" 0 "height" 0 "resource" false -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $result -}}

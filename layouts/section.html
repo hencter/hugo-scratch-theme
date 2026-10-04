@@ -1,0 +1,45 @@
+{{ define "main" }}
+  {{ partial "breadcrumbs.html" . }}
+
+  <header class="page__header">
+    <h1 class="page__title">{{ .Title }}</h1>
+    {{- with .Description }}<p class="page__lead">{{ . }}</p>{{ end }}
+    {{- if not .Date.IsZero }}
+      <p class="page__meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format (site.Params.dateFormat | default ":date_long") }}</time>
+      </p>
+    {{- end }}
+  </header>
+
+  {{ partial "banner.html" . }}
+
+  {{- with .Content }}
+    <div class="prose">{{ . }}</div>
+  {{- end }}
+
+  {{- /* `.Paginator` is used rather than `.Paginate` so that the same
+         paginator — created once, in head/meta.html for the paged <title> and
+         canonical URL — is what this template renders. Calling `.Paginate` here
+         with a different collection would be a second, conflicting invocation. */ -}}
+  {{- $paginator := .Paginator -}}
+
+  {{- $subsections := .Sections.ByWeight -}}
+  {{- if $subsections }}
+    <section class="section__children" aria-labelledby="section-children">
+      <h2 id="section-children" class="section__heading">{{ T "inThisSection" }}</h2>
+      <ul class="card-grid">
+        {{- range $subsections }}{{ partial "card.html" (dict "page" .) }}{{ end -}}
+      </ul>
+    </section>
+  {{- end }}
+
+  {{- $rows := slice -}}
+  {{- range $paginator.Pages }}{{ if .IsPage }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+  {{- if $rows }}
+    {{ partial "page-list.html" (dict "pages" $rows "group" (default false .Params.groupByYear)) }}
+  {{- else if not $subsections }}
+    <p class="page__empty">{{ T "noContent" }}</p>
+  {{- end }}
+
+  {{ partial "pagination.html" $paginator }}
+{{ end }}

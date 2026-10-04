@@ -1,0 +1,29 @@
+{{- /*
+  page-nav.html — previous / next within the current section.
+
+  `.PrevInSection` and `.NextInSection` follow the section's own ordering
+  (weight, then date), which is exactly the order the sidebar shows, so the two
+  navigations never disagree.
+*/ -}}
+{{- $page := . -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $show := index $ui "showPrevNext" -}}
+{{- if eq $show nil }}{{ $show = true }}{{ end -}}
+{{- $prev := $page.PrevInSection -}}
+{{- $next := $page.NextInSection -}}
+{{- if and $show (or $prev $next) -}}
+  <nav class="page-nav" aria-label="{{ T "pagination" }}">
+    {{- with $prev }}
+      <a class="page-nav__link" href="{{ .RelPermalink }}" rel="prev">
+        <span class="page-nav__label">{{ T "previous" }}</span>
+        <span class="page-nav__title">{{ .LinkTitle }}</span>
+      </a>
+    {{- end }}
+    {{- with $next }}
+      <a class="page-nav__link page-nav__link--next" href="{{ .RelPermalink }}" rel="next">
+        <span class="page-nav__label">{{ T "next" }}</span>
+        <span class="page-nav__title">{{ .LinkTitle }}</span>
+      </a>
+    {{- end }}
+  </nav>
+{{- end -}}

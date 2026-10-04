@@ -1,0 +1,12 @@
+{{- /*
+  note — a neutral callout.
+
+  STANDARD notation ({{< note >}}): this runs AFTER the Markdown renderer, so
+  `.Inner` is unrendered text and must be piped through `markdownify`. The
+  trade-off is that headings inside a standard-notation shortcode never reach
+  the table of contents.
+*/ -}}
+{{- partial "shortcodes/callout.html" (dict
+      "type" "note"
+      "title" (.Get "title" | default (.Get 0))
+      "content" (.Inner | markdownify)) -}}

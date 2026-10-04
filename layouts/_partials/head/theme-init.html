@@ -1,0 +1,32 @@
+{{- /*
+  head/theme-init.html — colour-scheme bootstrap.
+
+  This must be inline and synchronous: it runs while <head> is still being
+  parsed, so <html> carries the right value before the first paint. The
+  interactive switch lives in assets/js/modules/theme.js and uses the SAME
+  storage key — change one, change both.
+
+  Two attributes are set on purpose:
+    · data-theme = "light" | "dark"  → our design tokens in tokens.css
+    · class      = "light" | "dark"  → the Chroma stylesheets, which Hugo
+      generates with --modeSelector and therefore scopes as `.light` / `.dark`
+*/ -}}
+<script>
+  (function () {
+    var key = 'hugo-scratch:theme';
+    try {
+      var mode = window.localStorage.getItem(key) || 'system';
+      var dark =
+        mode === 'dark' ||
+        (mode !== 'light' &&
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var theme = dark ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.classList.add(theme);
+    } catch (error) {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light');
+    }
+  })();
+</script>

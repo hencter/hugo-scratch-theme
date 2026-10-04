@@ -1,0 +1,19 @@
+{{- /*
+  head/verification.html — search-console ownership verification.
+
+  Both tags are omitted entirely when the params are empty, so the default
+  output carries no dead meta tags. Fill these in when you register the site
+  with Google Search Console / Bing Webmaster Tools; the alternative "HTML file"
+  method needs no config at all — drop the file into static/.
+
+  [params.verification]
+    google = "…"   # <meta name="google-site-verification" content="…">
+    bing   = "…"   # <meta name="msvalidate.01" content="…">
+*/ -}}
+{{- $verification := site.Params.verification | default dict -}}
+{{- with index $verification "google" }}
+  <meta name="google-site-verification" content="{{ . }}">
+{{ end -}}
+{{- with index $verification "bing" }}
+  <meta name="msvalidate.01" content="{{ . }}">
+{{ end -}}

@@ -1,0 +1,307 @@
+/* ==========================================================================
+   Content — the .prose wrapper around anything Hugo rendered from Markdown
+   ========================================================================== */
+
+.prose {
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  scroll-margin-top: calc(var(--header-height) + var(--space-4));
+}
+
+/* Hugo's heading render hook emits <a class="heading-anchor"> next to headings. */
+.heading-anchor {
+  margin-left: 0.35em;
+  color: var(--color-text-faint);
+  font-size: 0.75em;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+h2:hover > .heading-anchor,
+h3:hover > .heading-anchor,
+h4:hover > .heading-anchor,
+h5:hover > .heading-anchor,
+h6:hover > .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--color-accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose li + li {
+  margin-top: var(--space-1);
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin-block: var(--space-1);
+}
+
+.prose dt {
+  font-weight: 650;
+}
+
+.prose dd {
+  margin: 0 0 var(--space-2) 1.4em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding: var(--space-1) 0 var(--space-1) var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose blockquote .quote-attribution {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-text-faint);
+  font-size: var(--text-sm);
+  font-style: normal;
+  text-align: right;
+}
+
+.prose img {
+  display: block;
+}
+
+.prose figure {
+  margin-inline: 0;
+}
+
+.prose a.external-link::after {
+  content: "↗";
+  margin-left: 0.15em;
+  font-size: 0.8em;
+  color: var(--color-text-faint);
+}
+
+/* --- Inline code --------------------------------------------------------- */
+.prose :not(pre) > code {
+  padding: 0.15em 0.35em;
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  overflow-wrap: break-word;
+}
+
+/* --- Code blocks --------------------------------------------------------- */
+.highlight {
+  position: relative;
+  margin-block: var(--space-5);
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-code-bg);
+  overflow: hidden;
+}
+
+.highlight__header {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-code-border);
+  background-color: var(--color-bg-inset);
+  font-size: var(--text-xs);
+}
+
+.highlight__lang,
+.highlight__filename {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.highlight__filename {
+  color: var(--color-text);
+}
+
+.copy-button {
+  padding: 0.15rem var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.copy-button[data-copied="true"] {
+  border-color: var(--color-tip);
+  color: var(--color-tip);
+}
+
+.highlight pre,
+.prose pre {
+  margin: 0;
+  padding: var(--space-4);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+.highlight pre code,
+.prose pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+}
+
+/* Chroma table/line-number layouts must scroll, not overflow the page. */
+.chroma {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.chroma td {
+  padding: 0;
+  border: 0;
+}
+
+/* --- Tables -------------------------------------------------------------- */
+.table-wrap {
+  margin-block: var(--space-5);
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.prose table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.prose th,
+.prose td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose thead th {
+  background-color: var(--color-bg-subtle);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.prose tbody tr:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.prose table.no-wrap-first-col td:first-child,
+.prose table.no-wrap-first-col th:first-child {
+  white-space: nowrap;
+}
+
+/* --- Task lists ---------------------------------------------------------- */
+.prose ul.contains-task-list {
+  padding-left: 0.4em;
+  list-style: none;
+}
+
+.prose li.task-list-item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.prose li.task-list-item input {
+  margin: 0;
+}
+
+/* --- Footnotes ----------------------------------------------------------- */
+.footnotes {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.footnotes ol {
+  padding-left: 1.2em;
+}
+
+.footnotes li:target {
+  background-color: var(--color-mark);
+}
+
+.footnote-ref a {
+  padding: 0 0.15em;
+  text-decoration: none;
+}
+
+/* --- Math (Goldmark passthrough) ---------------------------------------- */
+.math-block {
+  margin-block: var(--space-5);
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* --- Mermaid ------------------------------------------------------------- */
+.mermaid {
+  margin-block: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* --- Section index ------------------------------------------------------- */
+.section-intro {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.child-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  margin-block: var(--space-5);
+  padding: 0;
+  list-style: none;
+}

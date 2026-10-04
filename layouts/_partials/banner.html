@@ -1,0 +1,18 @@
+{{- /*
+  banner.html — draft / editorial notice at the top of a page.
+
+  Two sources, both real:
+    · .Draft, which is only true when the build included drafts (`hugo -D`)
+    · a `notice` front-matter string, for "preview", "deprecated", "migrated"…
+
+  The notice is a LITERAL string, not an i18n key on purpose: passing arbitrary
+  front-matter values to `T` would emit an MISSING_TRANSLATION warning for every
+  notice that has no catalogue entry.
+*/ -}}
+{{- $page := . -}}
+{{- $messages := slice -}}
+{{- if $page.Draft }}{{ $messages = $messages | append (T "draftBanner") }}{{ end -}}
+{{- with $page.Params.notice }}{{ $messages = $messages | append . }}{{ end -}}
+{{- range $messages }}
+  <p class="banner" role="note">{{ partial "icon.html" "info" }}<span>{{ . }}</span></p>
+{{- end -}}

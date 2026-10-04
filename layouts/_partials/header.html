@@ -1,0 +1,36 @@
+{{- /*
+  header.html — the site header: brand, primary menu, utility actions.
+
+  This is a real <header> landmark containing a real <nav>. The mobile
+  disclosure only toggles visibility (assets/js/modules/nav.js), so the menu is
+  present in the HTML and fully usable without JavaScript.
+*/ -}}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__brand" href="{{ site.Home.RelPermalink }}">
+      {{ partial "icon.html" "logo" }}
+      <span>{{ site.Title }}</span>
+    </a>
+
+    <nav id="site-nav" class="site-header__nav" aria-label="{{ T "mainNavigation" }}">
+      {{ partial "menu.html" (dict "page" . "menuID" "main") }}
+    </nav>
+
+    <div class="site-header__actions">
+      {{ partial "search.html" . }}
+      {{ partial "lang-switcher.html" . }}
+      {{ partial "theme-toggle.html" . }}
+
+      <button
+        class="icon-button nav-toggle"
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="site-nav"
+        aria-label="{{ T "toggleNavigation" }}"
+        title="{{ T "toggleNavigation" }}">
+        {{ partial "icon.html" "menu" }}
+      </button>
+    </div>
+  </div>
+</header>

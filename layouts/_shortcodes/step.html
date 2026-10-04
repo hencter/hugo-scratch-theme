@@ -1,0 +1,12 @@
+{{- /*
+  step — one item in a {{% steps %}} list. Markdown notation; `.Inner` arrives
+  already rendered.
+*/ -}}
+{{- if not .Parent -}}
+  {{- errorf "shortcode `step` must be nested inside `steps` (%s)" .Position -}}
+{{- end -}}
+{{- $title := .Get "title" | default (.Get 0) -}}
+<li class="steps__item">
+  {{- with $title }}<p class="steps__title">{{ . }}</p>{{ end -}}
+  <div class="steps__body">{{ .Inner }}</div>
+</li>

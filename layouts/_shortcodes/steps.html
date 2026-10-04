@@ -1,0 +1,13 @@
+{{- /*
+  steps — a numbered procedure. Markdown notation:
+
+      {{% steps %}}
+      {{% step "Build" %}}Run `hugo`.{{% /step %}}
+      {{% step "Verify" %}}Read `public/`.{{% /step %}}
+      {{% /steps %}}
+
+  An <ol> is used rather than a <div> soup so that the numbering is semantic:
+  screen readers announce "list of 2 items", and the numbers survive a reader
+  mode / print stylesheet.
+*/ -}}
+<ol class="steps"{{ with .Get "start" }} start="{{ . }}"{{ end }}>{{ .Inner }}</ol>

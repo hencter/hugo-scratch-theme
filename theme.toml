@@ -1,0 +1,29 @@
+# Metadata for https://themes.gohugo.io/ .
+# Hugo itself does not read this file at build time — it is metadata for the theme
+# gallery and for humans. The build-relevant version floor lives in hugo.toml
+# under [module.hugoVersion].
+
+name = "Hugo Scratch Theme"
+license = "MIT"
+licenselink = "https://github.com/hencter/hugo-scratch-theme/blob/main/LICENSE"
+description = "A batteries-included example Hugo theme: semantic HTML, complete SEO head, bilingual navigation, client-side search, dark mode, shortcodes, render hooks, and a CSS/JS pipeline built only with Hugo Pipes."
+homepage = "https://github.com/hencter/hugo-scratch-theme"
+demosite = "https://hencter.github.io/hugo-scratch/"
+tags = ["blog", "docs", "multilingual", "responsive", "seo", "dark", "search", "accessible"]
+features = [
+  "blog",
+  "documentation",
+  "multilingual",
+  "dark mode",
+  "client-side search",
+  "syntax highlighting",
+  "shortcodes",
+  "render hooks",
+  "custom output formats",
+  "semantic HTML",
+]
+min_version = "0.146.0"
+
+[author]
+  name = "Hencter Lew"
+  homepage = "https://github.com/hencter"

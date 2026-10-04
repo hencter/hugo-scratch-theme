@@ -1,0 +1,29 @@
+{{- /*
+  render-blockquote.html — every blockquote goes through here.
+
+  Two behaviours:
+
+    · a GitHub-style alert (`> [!NOTE]`, `> [!WARNING]`, `> [!IMPORTANT]`,
+      `> [!TIP]`, `> [!CAUTION]`) is turned into a callout, reusing exactly the
+      same partial as the {{< note >}} shortcode, so prose and shortcode
+      callouts can never drift apart visually;
+    · an ordinary quote is passed through unchanged.
+
+  The alert vocabulary has five values but only four callout styles, so the
+  mapping is explicit — `T "important"` would otherwise be a missing translation.
+*/ -}}
+{{- $alert := .AlertType -}}
+{{- if $alert -}}
+  {{- $map := dict "note" "note" "tip" "tip" "important" "warning" "warning" "warning" "caution" "danger" -}}
+  {{- $type := index $map (lower $alert) | default "note" -}}
+  {{- $title := .AlertTitle | default (T $type) -}}
+  <div class="callout callout--{{ $type }}">
+    <p class="callout__title">
+      {{- partial "icon.html" (dict "note" "info" "tip" "lightbulb" "warning" "alert" "danger" "shield" | index $type | default "info") -}}
+      <span>{{ $title }}</span>
+    </p>
+    <div class="callout__body">{{ .Text }}</div>
+  </div>
+{{- else -}}
+  <blockquote>{{ .Text }}</blockquote>
+{{- end -}}

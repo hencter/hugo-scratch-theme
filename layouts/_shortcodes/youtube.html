@@ -1,0 +1,31 @@
+{{- /*
+  youtube — overrides Hugo's built-in shortcode.
+
+  The built-in version embeds an <iframe> the moment the page loads, which
+  contacts YouTube (and sets cookies) before the reader asked for anything. This
+  override renders a link instead, so the page stays self-contained and no
+  third-party request happens until the reader decides to leave.
+
+      {{< youtube id="dQw4w9WgXcQ" title="Hugo in 5 minutes" >}}
+
+  The host follows `[privacy.youtube] privacyEnhanced` from the site config, so
+  the documented Hugo key still governs what this shortcode emits.
+*/ -}}
+{{- $id := .Get "id" | default (.Get 0) -}}
+{{- $title := .Get "title" | default "YouTube" -}}
+{{- if not $id -}}
+  {{- errorf "shortcode `youtube` needs a video id (%s)" .Position -}}
+{{- end -}}
+{{- $host := "www.youtube.com" -}}
+{{- with site.Config.Privacy -}}
+  {{- with .YouTube -}}
+    {{- if .PrivacyEnhanced }}{{ $host = "www.youtube-nocookie.com" }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+<aside class="video-link">
+  <a class="video-link__anchor" href="https://{{ $host }}/watch?v={{ $id }}" rel="noopener">
+    <span class="video-link__play" aria-hidden="true">▶</span>
+    <span>{{ $title }}</span>
+    <span class="visually-hidden">({{ T "externalLink" }})</span>
+  </a>
+</aside>

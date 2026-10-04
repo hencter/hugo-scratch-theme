@@ -1,0 +1,7 @@
+{{- /*
+  kbd — a keyboard key or chord.
+
+      Press {{< kbd "Ctrl" >}} + {{< kbd "K" >}} to search.
+*/ -}}
+{{- $text := .Get "text" | default (.Get 0) -}}
+<kbd>{{ $text }}</kbd>

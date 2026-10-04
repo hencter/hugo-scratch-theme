@@ -1,0 +1,42 @@
+{{- /*
+  layout/flags.html — returns the layout decisions for one page.
+
+  Returning a value from a partial (instead of printing markup) keeps the
+  "what shape is this page" question in one file. Call it with:
+
+      {{ $flags := partial "layout/flags.html" . }}
+      {{ $flags.sidebar }} / {{ $flags.toc }}
+
+  @context {page} page
+  @returns {dict} {sidebar: bool, toc: bool}
+*/ -}}
+
+{{- $page := . -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $nav := site.Params.nav | default dict -}}
+
+{{- /* --- Sidebar ------------------------------------------------------ */ -}}
+{{- $showSidebar := index $ui "showSidebar" -}}
+{{- if eq $showSidebar nil }}{{ $showSidebar = true }}{{ end -}}
+
+{{- $sections := index $nav "sidebarSections" | default slice -}}
+{{- $hasSidebar := false -}}
+{{- if and $showSidebar $page.Section -}}
+  {{- if in $sections $page.Section }}{{ $hasSidebar = true }}{{ end -}}
+{{- end -}}
+
+{{- /* --- Table of contents -------------------------------------------- */ -}}
+{{- $showToc := index $ui "showTableOfContents" -}}
+{{- if eq $showToc nil }}{{ $showToc = true }}{{ end -}}
+{{- $min := index $ui "tocMinHeadings" | default 3 -}}
+
+{{- $hasToc := false -}}
+{{- if and $showToc (ne $page.Params.toc false) -}}
+  {{- $headings := slice -}}
+  {{- with $page.Fragments -}}
+    {{- with .Headings -}}{{- $headings = . -}}{{- end -}}
+  {{- end -}}
+  {{- if ge (len $headings) $min }}{{ $hasToc = true }}{{ end -}}
+{{- end -}}
+
+{{- return (dict "sidebar" $hasSidebar "toc" $hasToc) -}}

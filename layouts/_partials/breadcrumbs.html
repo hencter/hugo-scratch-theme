@@ -1,0 +1,32 @@
+{{- /*
+  breadcrumbs.html — visible breadcrumb trail.
+
+  `.Ancestors` runs from the parent up to the home page; `.Reverse` therefore
+  runs home → parent. The home crumb is rendered explicitly and skipped inside
+  the loop, otherwise "Home" would appear twice on a top-level section page.
+
+  The same trail is emitted as BreadcrumbList JSON-LD in head/schema.html. Keep
+  the two in step: a crawlable breadcrumb that disagrees with the visible one is
+  a structured-data error, not a cosmetic one.
+*/ -}}
+
+{{- if not .IsHome -}}
+  {{- $ui := site.Params.ui | default dict -}}
+  {{- $show := index $ui "showBreadcrumbs" -}}
+  {{- if eq $show nil }}{{ $show = true }}{{ end -}}
+  {{- if $show -}}
+    <nav class="breadcrumbs" aria-label="{{ T "breadcrumb" }}">
+      <ol>
+        <li>
+          <a href="{{ site.Home.RelPermalink }}">{{ T "home" }}</a>
+        </li>
+        {{- range .Ancestors.Reverse -}}
+          {{- if not .IsHome -}}
+            <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+          {{- end -}}
+        {{- end -}}
+        <li><span aria-current="page">{{ .LinkTitle }}</span></li>
+      </ol>
+    </nav>
+  {{- end -}}
+{{- end -}}

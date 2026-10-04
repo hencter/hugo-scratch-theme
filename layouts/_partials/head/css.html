@@ -1,0 +1,44 @@
+{{- /*
+  head/css.html — the entire CSS delivery pipeline.
+
+  Nothing here needs Node.js, PostCSS or a bundler config file:
+
+    resources.Get "css/main.css"   → the theme's entry stylesheet
+      | css.Build                  → inlines every @import into one file
+      | resources.Concat           → appends the site's own custom.css
+      | minify | fingerprint       → production build, with an SRI hash
+
+  Two sources are concatenated rather than one being overwritten. Theme and
+  project assets merge at FILE level: a site that shipped its own
+  assets/css/main.css would silently replace the theme's, so a site's additions
+  belong in a differently-named file. Calling it custom.css keeps the theme
+  upgradeable.
+
+  The `errorf` in the else-branch is deliberate: without it a missing asset
+  yields a site that merely renders unstyled, and nothing says why. A build that
+  stops with "theme asset … is missing" is cheaper to debug.
+*/ -}}
+
+{{- $dev := hugo.IsDevelopment -}}
+{{- $opts := dict "minify" false -}}
+{{- $parts := slice -}}
+
+{{- with resources.Get "css/main.css" -}}
+  {{- $parts = $parts | append (. | css.Build $opts) -}}
+{{- else -}}
+  {{- errorf "theme asset assets/css/main.css is missing — cannot build the stylesheet" -}}
+{{- end -}}
+
+{{- with resources.Get "css/custom.css" -}}
+  {{- $parts = $parts | append (. | css.Build $opts) -}}
+{{- end -}}
+
+{{- $css := $parts | resources.Concat "css/bundle.css" -}}
+
+{{- if $dev -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+{{- else -}}
+  {{- with $css | minify | fingerprint "sha384" -}}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+  {{- end -}}
+{{- end -}}

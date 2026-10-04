@@ -1,0 +1,28 @@
+{{- /*
+  comments.html — the documented extension point for a comments provider.
+
+  This theme ships no third-party comment script: every provider requires an
+  account, a script and a privacy decision that belong to the site, not to a
+  theme. What it does ship is a working, script-free default — a link to the
+  repository's issue tracker — plus the contract for replacing it:
+
+      [params.comments]
+        repository = "owner/name"   # empty disables the section
+
+  A site that wants a hosted provider creates
+  layouts/_partials/comments.html in the PROJECT, which takes precedence over
+  this file without touching the theme. The project partial receives the page as
+  its context, exactly like this one.
+*/ -}}
+{{- $comments := site.Params.comments | default dict -}}
+{{- $repository := index $comments "repository" -}}
+{{- if and $repository .IsPage -}}
+  <section class="comments" aria-labelledby="comments-heading">
+    <h2 id="comments-heading">{{ T "discussion" }}</h2>
+    <p>
+      <a href="https://github.com/{{ $repository }}/issues/new?title={{ .Title | urlquery }}" rel="noopener">
+        {{ T "startDiscussion" }}
+      </a>
+    </p>
+  </section>
+{{- end -}}

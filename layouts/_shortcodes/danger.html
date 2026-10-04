@@ -1,0 +1,7 @@
+{{- /*
+  danger — a "this will break things" callout. Standard notation.
+*/ -}}
+{{- partial "shortcodes/callout.html" (dict
+      "type" "danger"
+      "title" (.Get "title" | default (.Get 0))
+      "content" (.Inner | markdownify)) -}}

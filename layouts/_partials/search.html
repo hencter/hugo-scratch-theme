@@ -1,0 +1,47 @@
+{{- /*
+  search.html — the search trigger and its <dialog>.
+
+  The dialog is real HTML sitting in the header; assets/js/modules/search.js
+  only wires the behaviour. The JSON index URL is taken from the home page's
+  `search` output format and handed to JavaScript twice on purpose:
+
+    · data-search-index on the dialog — a plain, inspectable attribute
+    · params.searchIndex via js.Build — what the module actually reads
+
+  If the `search` output format is not in [outputs], the whole control is
+  omitted rather than rendering a box that can never return a result.
+*/ -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $show := index $ui "showSearch" -}}
+{{- if eq $show nil }}{{ $show = true }}{{ end -}}
+{{- $index := "" -}}
+{{- with site.Home.OutputFormats.Get "search" }}{{ $index = .RelPermalink }}{{ end -}}
+{{- if and $show $index -}}
+  <button
+    class="icon-button"
+    type="button"
+    data-search-open
+    aria-label="{{ T "search" }}"
+    title="{{ T "search" }} (Ctrl+K)">
+    {{ partial "icon.html" "search" }}
+  </button>
+
+  <dialog class="search-dialog" data-search-dialog data-search-index="{{ $index }}">
+    <div class="search-dialog__field">
+      <label class="visually-hidden" for="search-input">{{ T "search" }}</label>
+      <input
+        class="search-dialog__input"
+        id="search-input"
+        type="search"
+        data-search-input
+        placeholder="{{ T "searchPlaceholder" }}"
+        autocomplete="off"
+        spellcheck="false">
+      <button class="icon-button" type="button" data-search-close aria-label="{{ T "close" }}" title="{{ T "close" }}">
+        {{ partial "icon.html" "close" }}
+      </button>
+    </div>
+    <p class="search-dialog__hint" data-search-status role="status" aria-live="polite">{{ T "searchHint" }}</p>
+    <ul class="search-results" data-search-results></ul>
+  </dialog>
+{{- end -}}

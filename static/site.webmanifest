@@ -1,0 +1,17 @@
+{
+  "name": "Hugo Scratch",
+  "short_name": "Scratch",
+  "description": "A scratch Hugo site that demonstrates the full feature set.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b6e6e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

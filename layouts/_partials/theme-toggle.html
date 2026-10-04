@@ -1,0 +1,29 @@
+{{- /*
+  theme-toggle.html — cycles light → dark → system.
+
+  The label is assembled from translated words carried in data attributes; the
+  resolved theme is applied by the inline bootstrap in head/theme-init.html
+  before first paint, and toggled from here afterwards.
+
+  Both icon variants are in the DOM and CSS reveals the right one, so the button
+  is correct on the very first paint instead of swapping after hydration.
+*/ -}}
+{{- $ui := site.Params.ui | default dict -}}
+{{- $show := index $ui "showThemeToggle" -}}
+{{- if eq $show nil }}{{ $show = true }}{{ end -}}
+{{- if $show -}}
+  <button
+    class="icon-button theme-toggle"
+    type="button"
+    data-theme-toggle
+    data-theme-value="light"
+    data-label-theme="{{ T "theme" }}"
+    data-label-light="{{ T "themeLight" }}"
+    data-label-dark="{{ T "themeDark" }}"
+    data-label-system="{{ T "themeSystem" }}"
+    aria-label="{{ T "theme" }}"
+    title="{{ T "theme" }}">
+    <span class="theme-toggle__icon theme-toggle__icon--light">{{ partial "icon.html" "sun" }}</span>
+    <span class="theme-toggle__icon theme-toggle__icon--dark">{{ partial "icon.html" "moon" }}</span>
+  </button>
+{{- end -}}

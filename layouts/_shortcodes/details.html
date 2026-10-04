@@ -1,0 +1,14 @@
+{{- /*
+  details — a collapsible block built on <details>/<summary>.
+
+  No JavaScript: the browser already implements the disclosure. The optional
+  `open` argument is compared as a STRING because `.Get` returns the literal
+  text for `open=true`, and a plain truthiness test would treat "false" as true.
+*/ -}}
+{{- $title := .Get "title" | default (.Get 0) | default (T "details") -}}
+{{- $open := false -}}
+{{- if eq (.Get "open" | default "" | string) "true" }}{{ $open = true }}{{ end -}}
+<details class="disclosure"{{ if $open }} open{{ end }}>
+  <summary>{{ $title }}</summary>
+  <div class="disclosure__body">{{ .Inner | markdownify }}</div>
+</details>

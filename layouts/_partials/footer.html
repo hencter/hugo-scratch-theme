@@ -1,0 +1,52 @@
+{{- /*
+  footer.html — site footer.
+
+  The "machine-readable" column is the point of the GEO block: a crawler or an
+  agent that lands on any page can find llms.txt, pages.json, the sitemap and the
+  feed without guessing URLs. The links come from `.OutputFormats`, so removing
+  an output format from the config removes its link — the two cannot drift.
+*/ -}}
+{{- $links := slice -}}
+{{- with site.Home.OutputFormats.Get "llms" }}{{ $links = $links | append (dict "label" "llms.txt" "href" .RelPermalink) }}{{ end -}}
+{{- with site.Home.OutputFormats.Get "pagesjson" }}{{ $links = $links | append (dict "label" "pages.json" "href" .RelPermalink) }}{{ end -}}
+{{- with site.Home.OutputFormats.Get "sitemap" }}{{ $links = $links | append (dict "label" "sitemap.xml" "href" .RelPermalink) }}{{ end -}}
+{{- with site.Home.OutputFormats.Get "rss" }}{{ $links = $links | append (dict "label" "index.xml" "href" .RelPermalink) }}{{ end -}}
+{{- with site.Home.OutputFormats.Get "md" }}{{ $links = $links | append (dict "label" "index.md" "href" .RelPermalink) }}{{ end -}}
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__column">
+        <p class="site-footer__heading">{{ site.Title }}</p>
+        <p>{{ site.Params.description }}</p>
+        {{- with site.Params.tagline }}<p>{{ . }}</p>{{ end }}
+      </div>
+
+      <div class="site-footer__column">
+        <p class="site-footer__heading">{{ T "sectionNavigation" }}</p>
+        <ul class="site-footer__list">
+          {{- range site.Menus.footer }}
+            <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+      </div>
+
+      <div class="site-footer__column">
+        <p class="site-footer__heading">{{ T "machineReadable" }}</p>
+        <ul class="site-footer__list">
+          {{- range $links }}
+            <li><a href="{{ .href }}">{{ .label }}</a></li>
+          {{- end }}
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {{ now.Year }} {{ site.Params.author | default site.Title }}</p>
+      <p>
+        {{ T "poweredBy" }} {{ hugo.Version }}
+        {{- with site.Params.repoURL }} · <a href="{{ . }}" rel="noopener">{{ T "viewSource" }}</a>{{ end -}}
+      </p>
+    </div>
+  </div>
+</footer>

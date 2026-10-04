@@ -1,0 +1,14 @@
+{{- /*
+  toc — print the table of contents Hugo builds for THIS page.
+
+  This exists to show the difference next to the theme's own <nav class="toc">:
+  `.TableOfContents` returns a finished <nav> string (fast, no markup control),
+  while layouts/_partials/toc.html rebuilds the same tree from `.Fragments` so it
+  can carry aria-current and the scroll-spy hooks.
+
+  `markup.tableOfContents.startLevel` / `endLevel` in the site config decide what
+  `.TableOfContents` includes — that is why the two can disagree.
+*/ -}}
+{{- with .Page.TableOfContents -}}
+  <div class="toc-inline" data-generated-toc>{{ . }}</div>
+{{- end -}}

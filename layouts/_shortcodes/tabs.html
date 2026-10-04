@@ -1,0 +1,31 @@
+{{- /*
+  tabs — a tab set. Use with markdown notation:
+
+      {{% tabs %}}
+      {{% tab "First" %}}…{{% /tab %}}
+      {{% tab "Second" %}}…{{% /tab %}}
+      {{% /tabs %}}
+
+  The tab BUTTONS are server-rendered from the parent store, so the component is
+  complete in the HTML and crawlers see every panel. assets/js/modules/tabs.js
+  only adds keyboard navigation and hides the inactive panels.
+*/ -}}
+{{- $titles := .Store.Get "tabTitles" | default slice -}}
+{{- if not $titles -}}
+  {{- errorf "shortcode `tabs` has no `tab` children (%s) — a tab set with no tabs renders an empty box" .Position -}}
+{{- end -}}
+<div class="tabs" data-tabs>
+  <div class="tabs__list" role="tablist" aria-label="{{ .Get "label" | default (T "tabs") }}">
+    {{- range $i, $tab := $titles }}
+      <button
+        class="tabs__tab"
+        type="button"
+        role="tab"
+        id="{{ $tab.id }}-tab"
+        aria-controls="{{ $tab.id }}-panel"
+        aria-selected="{{ cond (eq $i 0) "true" "false" }}"
+        tabindex="{{ cond (eq $i 0) "0" "-1" }}">{{ $tab.title }}</button>
+    {{- end }}
+  </div>
+  <div class="tabs__panels">{{ .Inner }}</div>
+</div>

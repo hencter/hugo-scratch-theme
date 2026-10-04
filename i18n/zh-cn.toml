@@ -1,0 +1,279 @@
+# ============================================================================
+#  i18n 词条表 —— 简体中文（zh-cn）
+# ----------------------------------------------------------------------------
+#  与 i18n/en.toml 逐键对应：Hugo 只在「模板用到的键在本语言文件里缺失」时才告警，
+#  所以新增键必须两边同时加，否则 --printI18nWarnings 会报缺翻译。
+#  模板调用：{{ T "key" }} / {{ T "key" . }} / {{ T "key" 3 }}
+# ============================================================================
+
+[skipToContent]
+other = "跳到正文"
+
+[menu]
+other = "菜单"
+
+[mainNavigation]
+other = "主导航"
+
+[toggleNavigation]
+other = "展开或收起导航"
+
+[breadcrumb]
+other = "面包屑导航"
+
+[home]
+other = "首页"
+
+[close]
+other = "关闭"
+
+# --- 搜索 -----------------------------------------------------------------
+[search]
+other = "搜索"
+
+[searchPlaceholder]
+other = "搜索全站…"
+
+[searchHint]
+other = "输入关键词过滤，按 Esc 关闭。"
+
+[searchLoading]
+other = "正在加载检索索引…"
+
+[searchNoResults]
+other = "没有匹配的页面。"
+
+[searchResults]
+# 刻意不做复数：数字由 JavaScript 替换，字符串里若写 Go 模板动作会在构建期被吃掉。
+other = "找到 %d 个页面"
+
+# --- 主题 -----------------------------------------------------------------
+[theme]
+other = "配色主题"
+
+[themeLight]
+other = "浅色"
+
+[themeDark]
+other = "深色"
+
+[themeSystem]
+other = "跟随系统"
+
+# --- 语言 -----------------------------------------------------------------
+[language]
+other = "语言"
+
+[switchLanguage]
+other = "切换语言"
+
+[contentLanguage]
+other = "内容语言"
+
+# --- 导航 -----------------------------------------------------------------
+[tableOfContents]
+other = "本页目录"
+
+[onThisPage]
+other = "本页目录"
+
+[sectionNavigation]
+other = "章节导航"
+
+[inThisSection]
+other = "本章内容"
+
+[pagination]
+other = "分页"
+
+[pageNumber]
+other = "第 {{ .PageNumber }} 页"
+
+[previous]
+other = "上一页"
+
+[next]
+other = "下一页"
+
+[backToTop]
+other = "返回顶部"
+
+[anchor]
+other = "锚点链接"
+
+[goHome]
+other = "回到首页"
+
+# --- 页面元信息 -----------------------------------------------------------
+[published]
+other = "发布于"
+
+[updated]
+other = "更新于"
+
+[author]
+other = "作者"
+
+[authors]
+other = "作者"
+
+[readingTime]
+one = "约 {{ .Count }} 分钟读完"
+other = "约 {{ .Count }} 分钟读完"
+
+[wordCount]
+one = "{{ .Count }} 字"
+other = "{{ .Count }} 字"
+
+[pageMetadata]
+other = "页面信息"
+
+[licenseLabel]
+other = "许可"
+
+[difficulty]
+other = "难度"
+
+[estimatedTime]
+other = "预计用时"
+
+[prerequisites]
+other = "前置条件"
+
+[outcomes]
+other = "你将学会"
+
+# --- 分类法 ---------------------------------------------------------------
+[tags]
+other = "标签"
+
+[categories]
+other = "分类"
+
+[series]
+other = "系列"
+
+[terms]
+other = "词条"
+
+[pageCount]
+one = "{{ .Count }} 个页面"
+other = "{{ .Count }} 个页面"
+
+[relatedPages]
+other = "相关页面"
+
+# --- 列表 -----------------------------------------------------------------
+[latestPosts]
+other = "最新文章"
+
+[allPosts]
+other = "全部文章"
+
+[readMore]
+other = "继续阅读"
+
+[noContent]
+other = "这里还没有内容。"
+
+[featured]
+other = "精选"
+
+# --- 操作 -----------------------------------------------------------------
+[copy]
+other = "复制"
+
+[copied]
+other = "已复制"
+
+[copyCode]
+other = "复制代码到剪贴板"
+
+[expand]
+other = "展开"
+
+[collapse]
+other = "收起"
+
+[editThisPage]
+other = "编辑本页"
+
+[viewSource]
+other = "查看源码"
+
+[markdownSource]
+other = "Markdown 源文"
+
+[machineReadable]
+other = "机器可读输出"
+
+[externalLink]
+other = "外部链接"
+
+[opensInNewTab]
+other = "在新标签页打开"
+
+[rss]
+other = "RSS 订阅"
+
+[sitemap]
+other = "站点地图"
+
+[agents]
+other = "给 AI 代理"
+
+[discussion]
+other = "讨论"
+
+[startDiscussion]
+other = "就本页发起讨论"
+
+# --- 短代码 ---------------------------------------------------------------
+[note]
+other = "提示"
+
+[tip]
+other = "技巧"
+
+[warning]
+other = "注意"
+
+[danger]
+other = "警告"
+
+[example]
+other = "示例"
+
+[details]
+other = "详情"
+
+[steps]
+other = "步骤"
+
+[tabs]
+other = "标签页"
+
+[videoUnsupported]
+other = "你的浏览器不支持内嵌视频。"
+
+# --- 状态 -----------------------------------------------------------------
+[draftBanner]
+other = "本页是草稿：生产构建不会包含它。"
+
+[futureBanner]
+other = "本页日期在未来，除非加 --buildFuture，否则不会出现在构建结果里。"
+
+[expiredBanner]
+other = "本页已过有效期，除非加 --buildExpired，否则不会出现在构建结果里。"
+
+[poweredBy]
+other = "由 Hugo 构建"
+
+[notFoundTitle]
+other = "页面不存在"
+
+[notFoundMessage]
+other = "你访问的页面不存在，可能已被移动或改名。"
+
+[notFoundHint]
+other = "可以试试搜索框，或者从首页重新开始。"

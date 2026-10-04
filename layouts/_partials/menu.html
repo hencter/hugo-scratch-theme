@@ -1,0 +1,49 @@
+{{- /*
+  menu.html — render a menu, recursively.
+
+  @context {dict} "page" (page) "menuID" (string)
+  @example {{ partial "menu.html" (dict "page" . "menuID" "main") }}
+
+  Two different questions produce the active state, and both are needed:
+    · IsMenuCurrent  — this entry IS the current page
+    · HasMenuCurrent — the current page lives BENEATH this entry
+
+  An entry written with `url` is treated as external when it starts with a
+  scheme; one written with `pageRef` yields a site-relative .URL. Note that
+  menu names are NOT passed through i18n here: a missing translation key would
+  emit an `i18n|MISSING_TRANSLATION` warning on every page. Multilingual menu
+  labels belong in per-language menu files instead:
+  config/_default/menus.zh-cn.toml and menus.en.toml.
+*/ -}}
+
+{{- $page := .page -}}
+{{- $menuID := .menuID -}}
+
+{{- with index site.Menus $menuID -}}
+  <ul class="menu">
+    {{- partial "inline/menu/walk.html" (dict "page" $page "menuEntries" .) -}}
+  </ul>
+{{- end -}}
+
+{{- define "_partials/inline/menu/walk.html" -}}
+  {{- $page := .page -}}
+  {{- range .menuEntries -}}
+    {{- $external := strings.HasPrefix .URL "http" -}}
+    {{- $attrs := dict "href" .URL -}}
+    {{- if $external -}}
+      {{- $attrs = merge $attrs (dict "class" "menu__external" "rel" "noopener") -}}
+    {{- else if $page.IsMenuCurrent .Menu . -}}
+      {{- $attrs = merge $attrs (dict "class" "is-current" "aria-current" "page") -}}
+    {{- else if $page.HasMenuCurrent .Menu . -}}
+      {{- $attrs = merge $attrs (dict "class" "is-ancestor" "aria-current" "true") -}}
+    {{- end -}}
+    <li class="menu__item{{ if .Children }} menu__item--parent{{ end }}">
+      <a{{ range $k, $v := $attrs }}{{ with $v }}{{ printf " %s=%q" $k $v | safeHTMLAttr }}{{ end }}{{ end }}>{{ .Name }}</a>
+      {{- with .Children -}}
+        <ul class="menu__submenu">
+          {{- partial "inline/menu/walk.html" (dict "page" $page "menuEntries" .) -}}
+        </ul>
+      {{- end -}}
+    </li>
+  {{- end -}}
+{{- end -}}

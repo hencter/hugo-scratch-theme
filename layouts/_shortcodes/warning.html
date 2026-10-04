@@ -1,0 +1,7 @@
+{{- /*
+  warning — a "careful" callout. Standard notation; `.Inner` needs markdownify.
+*/ -}}
+{{- partial "shortcodes/callout.html" (dict
+      "type" "warning"
+      "title" (.Get "title" | default (.Get 0))
+      "content" (.Inner | markdownify)) -}}

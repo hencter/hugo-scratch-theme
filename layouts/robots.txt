@@ -1,0 +1,24 @@
+{{- /*
+  robots.txt — generated, not a static file, so the rules follow the build
+  environment.
+
+  `hugo` sets hugo.Environment to "production"; `hugo server` and
+  `hugo -e staging` do not. A preview deployment therefore blocks every crawler
+  and can never compete with the real site in an index.
+
+  The Sitemap line must be an ABSOLUTE URL — the robots.txt specification
+  requires it, and crawlers silently ignore a relative one.
+*/ -}}
+{{- if hugo.IsProduction -}}
+User-agent: *
+Allow: /
+
+# The site publishes everything; there is nothing to hide from a well-behaved
+# crawler. AI crawlers are welcome — llms.txt and pages.json are the intended
+# machine-readable entry points.
+Sitemap: {{ "sitemap.xml" | absURL }}
+{{ else -}}
+# Non-production build ({{ hugo.Environment }}): keep every crawler out.
+User-agent: *
+Disallow: /
+{{ end -}}
