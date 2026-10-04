@@ -5,6 +5,27 @@
    dark theme needs no duplicate rules.
    ========================================================================== */
 
+/* --- Inline icons --------------------------------------------------------
+   Every icon comes from layouts/_partials/icon.html, which stamps class="icon".
+   This one rule is what stops a component from forgetting to size an icon: an
+   inline <svg> with a viewBox but no width or height has no intrinsic size, so
+   the default sizing algorithm makes it 100% of its container — which is how a
+   callout icon once filled the whole callout. `flex: none` keeps a flex row from
+   shrinking it to pay for a long label.
+   ------------------------------------------------------------------------- */
+.icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+}
+
+/* Contexts that want a different optical size override that single rule. */
+.callout__title .icon,
+.banner .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 /* --- Buttons and icon buttons ------------------------------------------- */
 .button,
 .icon-button {
