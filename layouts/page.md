@@ -25,9 +25,23 @@
       "section" .Section
       "language" site.Language.Locale
       "wordCount" .WordCount
-      "readingTime" .ReadingTime
-      "tags" $tags
-      "categories" $categories -}}
+      "readingTime" .ReadingTime -}}
+{{- /* Empty taxonomy lists are OMITTED, not emitted as `tags: []`.
+
+       go-yaml emits an anchor when the same value is referenced twice, and Hugo's
+       no-argument `slice` yields the same empty slice for both keys. On a page
+       with no tags and no categories that produced
+
+           categories: &categories
+           []
+
+       plus `tags: *categories` further down — YAML that npm's `yaml`, PyYAML and
+       go-yaml all reject, because the value node is not indented under its key.
+       18 of the 136 generated twins were unparseable. Omitting the key is both
+       correct and simpler for the consumer: "no tags" and "tags: []" mean the
+       same thing to a reader of the file. */ -}}
+{{- with $tags }}{{ $meta = merge $meta (dict "tags" .) }}{{ end -}}
+{{- with $categories }}{{ $meta = merge $meta (dict "categories" .) }}{{ end -}}
 {{- if not .Date.IsZero }}{{ $meta = merge $meta (dict "date" (.Date.Format "2006-01-02")) }}{{ end -}}
 {{- if not .Lastmod.IsZero }}{{ $meta = merge $meta (dict "lastmod" (.Lastmod.Format "2006-01-02")) }}{{ end -}}
 {{- with .Params.difficulty }}{{ $meta = merge $meta (dict "difficulty" .) }}{{ end -}}

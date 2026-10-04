@@ -87,16 +87,26 @@
   {{- if $img.url }}{{ $main = merge $main (dict "image" $img.url) }}{{ end -}}
 {{- end -}}
 
-{{- /* --- Breadcrumbs ---------------------------------------------------- */ -}}
+{{- /* --- Breadcrumbs -------------------------------------------------------
+       These names must match layouts/_partials/breadcrumbs.html EXACTLY. A
+       machine-readable trail that disagrees with the visible one is a
+       structured-data error, not a cosmetic one — and it was one: this block
+       used `.Title`, breadcrumbs.html uses `T "home"` for the root and
+       `.LinkTitle` elsewhere, so a real page showed
+       "首页 / 文档 / SEO" against JSON-LD "Hugo Scratch / 文档 / SEO 与发现".
+       Measured on 4 of 4 sampled pages before the fix.
+       -------------------------------------------------------------------- */ -}}
 {{- $graph := slice $org $website -}}
 {{- if not $page.IsHome -}}
-  {{- $items := slice -}}
-  {{- $position := 1 -}}
+  {{- $items := slice (dict "@type" "ListItem" "position" 1 "name" (T "home") "item" site.Home.Permalink) -}}
+  {{- $position := 2 -}}
   {{- range $page.Ancestors.Reverse -}}
-    {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" .Title "item" .Permalink) -}}
-    {{- $position = add $position 1 -}}
+    {{- if not .IsHome -}}
+      {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" .LinkTitle "item" .Permalink) -}}
+      {{- $position = add $position 1 -}}
+    {{- end -}}
   {{- end -}}
-  {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" $page.Title "item" $page.Permalink) -}}
+  {{- $items = $items | append (dict "@type" "ListItem" "position" $position "name" $page.LinkTitle "item" $page.Permalink) -}}
   {{- $graph = $graph | append $main (dict
         "@type" "BreadcrumbList"
         "@id" (printf "%s#breadcrumb" $page.Permalink)

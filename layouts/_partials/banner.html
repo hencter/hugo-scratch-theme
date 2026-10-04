@@ -1,17 +1,43 @@
 {{- /*
-  banner.html — draft / editorial notice at the top of a page.
+  banner.html — the build-state notice at the top of a page.
 
-  Two sources, both real:
-    · .Draft, which is only true when the build included drafts (`hugo -D`)
+  Four sources, all real, and each one is visible only under a specific build:
+
+    · `.Draft`       true only when the build included drafts      (`hugo -D`)
+    · `.PublishDate` in the future                                 (`--buildFuture`)
+    · `.ExpiryDate`  in the past                                   (`--buildExpired`)
     · a `notice` front-matter string, for "preview", "deprecated", "migrated"…
 
-  The notice is a LITERAL string, not an i18n key on purpose: passing arbitrary
-  front-matter values to `T` would emit an MISSING_TRANSLATION warning for every
-  notice that has no catalogue entry.
+  Hugo EXCLUDES a draft, a future-dated page and an expired page from the build,
+  so the first three banners can only ever be seen by opting in. `hugo list
+  drafts`, `hugo list future` and `hugo list expired` report the same pages
+  without building them, which is the cheap way to check the mechanism.
+
+  `.PublishDate` falls back to `.Date`, which is why a page with a future `date`
+  is filtered out unless --buildFuture is passed.
+
+  The notice is a LITERAL string rather than an i18n key on purpose: passing an
+  arbitrary front-matter value to `T` would emit a MISSING_TRANSLATION warning for
+  every notice that has no catalogue entry.
 */ -}}
 {{- $page := . -}}
 {{- $messages := slice -}}
+{{- /* Two parsing traps meet here, and both were hit while writing this file:
+
+       1. `now` must be bound to a variable. Passing the function directly as a
+          method argument — `.PublishDate.After now` — fails with
+          "wrong number of args for After: want 1 got 0".
+       2. The method call must be PARENTHESISED inside `and`. `and` takes a list
+          of separate pipelines, so `and A $p.PublishDate.After $now` is read as
+          three operands and `.After` is called with no argument at all. */ -}}
+{{- $now := now -}}
 {{- if $page.Draft }}{{ $messages = $messages | append (T "draftBanner") }}{{ end -}}
+{{- if and (not $page.PublishDate.IsZero) ($page.PublishDate.After $now) -}}
+  {{- $messages = $messages | append (T "futureBanner") -}}
+{{- end -}}
+{{- if and (not $page.ExpiryDate.IsZero) ($page.ExpiryDate.Before $now) -}}
+  {{- $messages = $messages | append (T "expiredBanner") -}}
+{{- end -}}
 {{- with $page.Params.notice }}{{ $messages = $messages | append . }}{{ end -}}
 {{- range $messages }}
   <p class="banner" role="note">{{ partial "icon.html" "info" }}<span>{{ . }}</span></p>

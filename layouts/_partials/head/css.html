@@ -21,8 +21,11 @@
   fast inliner resolves). Splitting them gives each resolver the import kind it
   understands.
 
-  The layer order lives in css/tailwind.css and is declared explicitly, so it
-  survives concatenation: theme < components < utilities. That is what lets a
+  The layer order is PREPENDED as its own resource (css/00-layer-order.css) — it
+  is deliberately not written inside either source file, because a statement that
+  does not come first in the bundle gets rewritten by the minifier and the order
+  is then decided by first encounter instead. Order: theme < components <
+  utilities. That is what lets a
   Tailwind utility override one of the theme's component classes.
 
   ⚠ This whole partial must run DEFERRED — Tailwind reads hugo_stats.json, which

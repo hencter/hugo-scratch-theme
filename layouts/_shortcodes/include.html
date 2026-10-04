@@ -1,0 +1,29 @@
+{{- /*
+  include — render a reusable fragment from the headless bundle.
+
+      {{< include "build-gate" >}}
+
+  The fragment lives at content/snippets/<name>/index.md with `headless = true`
+  on it. A headless bundle is built but never published: it gets no URL, no
+  listing entry and no Markdown twin — it is content that exists only to be
+  included somewhere else. That is the difference between reuse and a page that
+  happens to be linked from several places.
+
+  Two consequences worth knowing:
+
+    · `site.GetPage` finds a headless bundle by path, which is how this works at
+      all; page collections (`.Pages`, `.RegularPages`, `.Sections`) deliberately
+      do not contain it;
+    · the fragment is Markdown, so it produces HTML here. It is NOT re-parsed for
+      shortcodes in the caller's context — a fragment that needs the caller's
+      page context should be a partial instead.
+*/ -}}
+{{- $name := .Get "name" | default (.Get 0) -}}
+{{- if not $name -}}
+  {{- errorf "shortcode `include` needs a snippet name (%s)" .Position -}}
+{{- end -}}
+{{- with site.GetPage (printf "/snippets/%s" $name) -}}
+  {{- .Content -}}
+{{- else -}}
+  {{- errorf "include: no snippet at /snippets/%s (%s)" $name .Position -}}
+{{- end -}}

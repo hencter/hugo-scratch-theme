@@ -287,3 +287,10 @@ other = "The page you requested does not exist. It may have been moved or rename
 
 [notFoundHint]
 other = "Try the search box, or start again from the home page."
+
+# --- Documentation references ---------------------------------------------
+[reference]
+other = "Reference"
+
+[referenceUpstream]
+other = "Upstream documentation"
