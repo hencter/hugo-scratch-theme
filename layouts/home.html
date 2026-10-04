@@ -2,6 +2,15 @@
   {{- $home := site.Params.home | default dict -}}
   {{- $latestCount := index $home "latestCount" | default 5 -}}
 
+  {{- /* The home page needs its own <h1>. Content pages get one from page.html,
+         but the home page's Markdown body starts at "##" by contract, so without
+         this the document would have no top-level heading at all: no accessible
+         page title, and a heading outline that begins at level two. */ -}}
+  <header class="home__hero">
+    <h1 class="home__title">{{ .Title }}</h1>
+    {{- with site.Params.tagline }}<p class="home__tagline">{{ . }}</p>{{ end }}
+  </header>
+
   {{- with .Content }}
     <div class="prose home__intro">{{ . }}</div>
   {{- end }}
