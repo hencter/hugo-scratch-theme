@@ -1,0 +1,33 @@
+{{- /*
+  toc-headings.html — the page's top-level headings, normalised.
+
+  Hugo 0.167 wraps the heading tree in a synthetic level-0 node that has no ID
+  and no title, so `.Fragments.Headings` is ALWAYS a one-element slice whose
+  single child holds the real headings. Measured on this site and reproduced in
+  a theme-less throwaway site, so it is Hugo's shape and not a render hook:
+
+      len .Fragments.Headings                  == 1     (level 0, id "", title "")
+      (index .Fragments.Headings 0).Headings   == the h2s
+
+  Everything that counts or walks `.Fragments.Headings` directly therefore sees
+  "1 heading" on every page. That is why layout/flags.html never reached the
+  `tocMinHeadings` threshold and no page ever got a table of contents, and why
+  the tree partial would have emitted one empty link if it had.
+
+  Unwrap the synthetic node here, once, so the two callers — the yes/no decision
+  in layout/flags.html and the markup in toc.html — cannot disagree.
+
+  @context {page} page
+  @returns {slice} []HeadingInfo — top-level headings, each with nested .Headings
+*/ -}}
+
+{{- $headings := slice -}}
+{{- with .Fragments -}}
+  {{- with .Headings -}}{{- $headings = . -}}{{- end -}}
+{{- end -}}
+
+{{- if and (eq (len $headings) 1) (eq (index $headings 0).Level 0) -}}
+  {{- $headings = (index $headings 0).Headings -}}
+{{- end -}}
+
+{{- return $headings -}}

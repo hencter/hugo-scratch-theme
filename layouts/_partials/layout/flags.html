@@ -16,7 +16,7 @@
 {{- $nav := site.Params.nav | default dict -}}
 
 {{- /* --- Sidebar ------------------------------------------------------ */ -}}
-{{- $showSidebar := index $ui "showSidebar" -}}
+{{- $showSidebar := $ui.showSidebar -}}
 {{- if eq $showSidebar nil }}{{ $showSidebar = true }}{{ end -}}
 
 {{- $sections := index $nav "sidebarSections" | default slice -}}
@@ -26,16 +26,17 @@
 {{- end -}}
 
 {{- /* --- Table of contents -------------------------------------------- */ -}}
-{{- $showToc := index $ui "showTableOfContents" -}}
+{{- /* `.Params` is a maps.Params: Hugo lower-cases the keys it stores, so a
+     plain `index $ui "showTableOfContents"` never matches and the lookup
+     silently returns nil. Field access is case-insensitive, which is what makes
+     these three `[ui]` settings real instead of decorative. */ -}}
+{{- $showToc := $ui.showTableOfContents -}}
 {{- if eq $showToc nil }}{{ $showToc = true }}{{ end -}}
-{{- $min := index $ui "tocMinHeadings" | default 3 -}}
+{{- $min := $ui.tocMinHeadings | default 3 -}}
 
 {{- $hasToc := false -}}
 {{- if and $showToc (ne $page.Params.toc false) -}}
-  {{- $headings := slice -}}
-  {{- with $page.Fragments -}}
-    {{- with .Headings -}}{{- $headings = . -}}{{- end -}}
-  {{- end -}}
+  {{- $headings := partial "toc-headings.html" $page -}}
   {{- if ge (len $headings) $min }}{{ $hasToc = true }}{{ end -}}
 {{- end -}}
 

@@ -15,8 +15,7 @@
 
 {{- $flags := partial "layout/flags.html" . -}}
 {{- if $flags.toc -}}
-  {{- $headings := slice -}}
-  {{- with .Fragments -}}{{- with .Headings -}}{{- $headings = . -}}{{- end -}}{{- end -}}
+  {{- $headings := partial "toc-headings.html" . -}}
   <nav class="toc" aria-labelledby="toc-heading" data-toc>
     <p class="sidebar__title" id="toc-heading">{{ T "onThisPage" }}</p>
     {{- partial "inline/toc/tree.html" (dict "headings" $headings) -}}
